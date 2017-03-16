@@ -1,0 +1,77 @@
+<link href="https://fonts.googleapis.com/css?family=Righteous|Oswald" rel="stylesheet">
+
+html {
+  background-color: khaki;
+}
+
+.invalid {
+  color: red;
+}
+
+h1 {
+  font-family: 'Righteous', cursive;
+  font-size: 48pt;
+  color: darkgreen;
+  text-transform: uppercase;
+  text-align: center;
+  padding-bottom: 0pt;
+  margin-bottom: 6pt;
+}
+
+h1 a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.tagline {
+  font-family: 'Oswald', sans-serif;
+  font-size: 16pt;
+  color: forestgreen;
+  text-align: center;
+  margin-top: 0pt;
+  padding-top: 0pt;
+}
+
+.mainpage {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+
+.login {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+.entry {
+  position: relative;
+}
+
+.entry_posted {
+  position: absolute;
+  right: 10px;
+  bottom: 0px;
+}
+
+.form_label {
+  width: 100%;
+  margin-bottom: 0px;
+}
+
+.form_input {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.login_form, .signup_form {
+  width: 60%;
+  max-width: 300px;
+  margin-right: auto;
+  margin-left: auto;
+  border: 1px solid black;
+  padding: 20px;
+  background-color: greenyellow;
+}
+
+}

@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <title>Blog</title>
+    <meta name="viewport" content="width=device_width, initial_scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/main.css">
+  </head>
+  <body>
+    <header>
+      <div class="login">
+        {% if username %}
+          <span class="welcome">Hello, {{username}}!</span>
+          <span class="logout"> <a href="/logout">logout</a></span>
+        {% else %}
+          <a href="/login">login</a>
+        {% endif %}
+      </div>
+      <h1><a href="/">Blog</a></h1>
+      <p class="tagline">A reaallly great blog!</p>
+      <hr>
+    </header>
+
+    {% block content %}{% endblock %}
+
+  </body>
+</html>

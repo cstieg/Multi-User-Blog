@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <content>
+    {% for entry in blogEntries %}
+      <section class="entry">
+        <div class="entry_title">
+          <h2>{{entry.title}}</h2>
+        </div>
+        <div class="entry_content">
+          <p>{{entry.entry}}</p>
+        </div>
+        <br>
+        <div class="entry_posted">
+          <p>Written on {{entry.posted|date}} by {{entry.author}}</p>
+        </div>
+      </section>
+      <hr>
+    {% endfor %}
+    </content>
+
+    <footer>
+      <p class="newpost"><a href="/newpost">Click to add a new entry</a></p>
+    </footer>
+
+{% endblock content %}

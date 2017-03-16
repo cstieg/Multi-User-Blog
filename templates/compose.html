@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h3>Compose New Post</h3>
+    <content>
+      <form method="post" action="newpost">
+        <label>
+          <p class="form_label">Title</p>
+          <input class="form_input" name="subject" type="text" value="{{title}}">
+        </label><br>
+        <label>
+          <p class="form_label">Blog Entry</p>
+          <textarea class="form_input" name="content" cols="50" rows="25">{{entry}}</textarea>
+        </label>
+        <br>
+        <input type="submit">
+      </form>
+
+      <br>
+      <span class="error">{{error}}</span>
+    </content>
+{% endblock content %}
