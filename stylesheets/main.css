@@ -1,5 +1,3 @@
-<link href="https://fonts.googleapis.com/css?family=Righteous|Oswald" rel="stylesheet">
-
 html {
   background-color: khaki;
 }
@@ -45,26 +43,52 @@ h1 a {
 }
 
 .entry {
-  position: relative;
+  display: block;
 }
 
-.entry_posted {
-  position: absolute;
-  right: 10px;
-  bottom: 0px;
+.entry-footer {
+  background-color: tan;
+  border: solid black thin;
+  display: flex;
+  flex-direction: row;
 }
 
-.form_label {
+.likes,
+.comments,
+.edit,
+.delete {
+  margin: 2px 10px;
+}
+
+.likes,
+.comments {
+  display: flex;
+  flex-direction: row;
+}
+
+.like-button,
+.like-count,
+.comment-button,
+.comment-count {
+  margin: 0 10px;
+}
+
+.entry-posted {
+  margin-left: auto;
+}
+
+.form-label {
   width: 100%;
   margin-bottom: 0px;
 }
 
-.form_input {
+.form-input {
   width: 100%;
   margin-bottom: 10px;
 }
 
-.login_form, .signup_form {
+.login-form,
+.signup-form {
   width: 60%;
   max-width: 300px;
   margin-right: auto;
@@ -72,6 +96,4 @@ h1 a {
   border: 1px solid black;
   padding: 20px;
   background-color: greenyellow;
-}
-
 }

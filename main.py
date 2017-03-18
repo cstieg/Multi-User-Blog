@@ -8,7 +8,6 @@ import hashlib
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(autoescape = True, loader = jinja2.FileSystemLoader(template_dir))
 
-
 class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
@@ -25,13 +24,20 @@ class BlogEntry(db.Model):
     entry = db.TextProperty(required = True)
     author = db.TextProperty(required = True)
     posted = db.DateTimeProperty(auto_now_add = True)
+    likes = db.IntegerProperty()
+    comments = db.IntegerProperty()
+
+class Comment(db.Model):
+    blogEntryID = db.IntegerProperty(required = True)
+    comment = db.TextProperty(required = True)
+    author = db.TextProperty(required = True)
+    posted = db.DateTimeProperty(auto_now_add = True)
+    likes = db.IntegerProperty()
 
 class User(db.Model):
     username = db.StringProperty(required = True)
     password = db.StringProperty(required = True)
     signedUp = db.DateTimeProperty(auto_now_add = True)
-
-
 
 class MainPage(Handler):
     def get(self, q=""):       
@@ -43,7 +49,6 @@ class MainPage(Handler):
             blogEntries = [db.get(entryKey)]
         else:
             blogEntries = db.GqlQuery("SELECT* FROM BlogEntry ORDER BY posted DESC")
-
         self.render("mainpage.html", blogEntries=blogEntries, username=getUsername(self))
         
 class Compose(Handler):
@@ -72,6 +77,29 @@ class Compose(Handler):
             if not title and not entry:
                 error = "Must input title and blog entry content!"
             self.render("compose.html", entry=entry, title=title, error=error, username=username)
+            
+class DeletePost(Handler):
+    """Deletes a post passed in from /deletepost/[postID]"""
+    def post(self, q=""):
+        # check to make sure valid login
+        if not validUserLogin(self):
+            self.redirect("/login")
+        if q:
+            # query post by id passed in
+            entryKey = db.Key.from_path('BlogEntry', int(q))
+            if not entryKey:
+                self.error(404)
+                return
+            blogEntry = db.get(entryKey)
+            # only author can delete
+            if blogEntry.author == getUsername(self):
+                blogEntry.delete()
+                self.redirect("/")
+            else:
+                self.error(401)
+        else:
+            # if post id not found, it is a bad request
+            self.error(400)
 
 class Signup(Handler):
     def get(self):
@@ -118,7 +146,6 @@ class Signup(Handler):
                 self.response.set_cookie('username', username, max_age=60*60*24)
                 self.response.redirect('/newpost')
                 self.render("success.html", username = username)
-
 
 
 class Login(Handler):
@@ -181,7 +208,8 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', Compose),
                                ('/signup', Signup),
                                ('/login', Login),
-                               ('/logout', Logout)],
+                               ('/logout', Logout),
+                               ('/deletepost/([0-9]+)', DeletePost)],
                                 debug=True)
 
 
