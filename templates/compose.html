@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
+    {% block formAction %}
     <h3>Compose New Post</h3>
-    <content>
-      <form method="post" action="newpost">
+    <main>
+        <form method="post" action="newpost">{% endblock formAction %}
         <label>
           <p class="form_label">Title</p>
           <input class="form_input" name="subject" type="text" value="{{title}}">
@@ -18,5 +19,5 @@
 
       <br>
       <span class="error">{{error}}</span>
-    </content>
+    </main>
 {% endblock content %}

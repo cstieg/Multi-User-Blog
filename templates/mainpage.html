@@ -23,11 +23,11 @@
                     {{entry.comments}}
                 </div>
             </div>
-            <div class="edit">
-                Edit
-            </div>
+            <form class="edit" action="editpost/{{entry.key().id()}}" method="get">
+                <button class="edit-post" type="submit">Edit</button>
+            </form>
             <div class="delete">
-                <button id="delete-post" onclick="verifyDeletePost({{entry.key().id()}})">Delete</button>
+                <button class="delete-post" onclick="verifyDeletePost({{entry.key().id()}})">Delete</button>
             </div>
             <span class="entry-posted">Written on {{entry.posted|date}} by {{entry.author}}</span>
         </div>

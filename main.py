@@ -1,4 +1,5 @@
 import os
+import time
 import webapp2
 import jinja2
 import re
@@ -24,8 +25,8 @@ class BlogEntry(db.Model):
     entry = db.TextProperty(required = True)
     author = db.TextProperty(required = True)
     posted = db.DateTimeProperty(auto_now_add = True)
-    likes = db.IntegerProperty()
-    comments = db.IntegerProperty()
+    likes = db.IntegerProperty(default = 0)
+    comments = db.IntegerProperty(default = 0)
 
 class Comment(db.Model):
     blogEntryID = db.IntegerProperty(required = True)
@@ -100,6 +101,60 @@ class DeletePost(Handler):
         else:
             # if post id not found, it is a bad request
             self.error(400)
+            
+class EditPost(Handler):
+    """Replaces the blog text with the text passed in from /editpost/[postid]"""
+    
+    def get(self, q=""):
+        if not validUserLogin(self):
+            self.redirect("/login")
+        if q:
+            # query post by id passed in
+            entryKey = db.Key.from_path('BlogEntry', int(q))
+            post = db.get(entryKey)
+            
+            self.render("edit.html", postID=q, entry=post.entry, title=post.title, username=getUsername(self))
+        else:
+            self.error(400)
+
+    def post(self, q=""):
+        # check to make sure valid login
+        if not validUserLogin(self):
+            self.redirect("/login")
+        if q:
+            # query post by id passed in
+            entryKey = db.Key.from_path('BlogEntry', int(q))
+            
+            if not entryKey:
+                self.error(400)
+                return
+            blogEntry = db.get(entryKey)
+            
+            # only author can delete
+            if blogEntry.author == getUsername(self):
+                title = self.request.get("subject")
+                entry = self.request.get("content")
+                
+                # validate input
+                if title and entry:
+                    blogEntry.title = title
+                    blogEntry.entry = entry
+                    db.put(blogEntry)
+                    
+                    # workaround to wait for eventual consistency in datastore
+                    # so as not to redirect back to home page before updating
+                    while blogEntry.title != title or blogEntry.entry != entry:
+                        time.sleep(0.01)
+                        
+                    self.redirect("/")
+                else:
+                    self.error(400)
+            else:
+                # unauthorized
+                self.error(401)
+        else:
+            # if post id not found, it is a bad request
+            self.error(400)        
 
 class Signup(Handler):
     def get(self):
@@ -209,7 +264,8 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/signup', Signup),
                                ('/login', Login),
                                ('/logout', Logout),
-                               ('/deletepost/([0-9]+)', DeletePost)],
+                               ('/deletepost/([0-9]+)', DeletePost),
+                               ('/editpost/([0-9]+)', EditPost)],
                                 debug=True)
 
 

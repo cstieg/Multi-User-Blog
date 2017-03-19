@@ -19,3 +19,7 @@ function deletePost(postID) {
 function closeDialog() {
   $('.dialog').dialog('close');
 }
+
+function editPost(postID) {
+
+}
