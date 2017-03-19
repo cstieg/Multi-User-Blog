@@ -3,7 +3,7 @@
 {% block content %}
 <main>
     {% for entry in blogEntries %}
-    <article class="entry">
+    <article class="entry" id="{{entry.key().id()}}">
         <h2 class="entry-title"><a href="/{{entry.key().id()}}">{{entry.title}}</a></h2>
         <p class="entry-content">{{entry.entry}}</p>
         <div class="entry-footer">
@@ -26,18 +26,28 @@
             <div class="edit">
                 Edit
             </div>
-            <form class="delete" action="/deletepost/{{entry.key().id()}}" method="post">
-                <button type="submit" name="delete-post" class="delete-post">Delete</button>
-            </form>
+            <div class="delete">
+                <button id="delete-post" onclick="verifyDeletePost({{entry.key().id()}})">Delete</button>
+            </div>
             <span class="entry-posted">Written on {{entry.posted|date}} by {{entry.author}}</span>
         </div>
+        <hr>
     </article>
-    <hr>
     {% endfor %}
 </main>
 
 <footer>
     <p class="newpost"><a href="/newpost">Click to add a new entry</a></p>
 </footer>
+
+<div class="dialog" id="delete-post-dialog" title="Delete Post?">
+
+        <p class="message">
+            Delete this post?  This action cannot be reversed.
+        </p>
+        <button name="delete" onclick="">Delete</button>
+        <button name="cancel" onclick="closeDialog()">Cancel</button>
+
+</div>
 
 {% endblock content %}

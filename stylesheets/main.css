@@ -97,3 +97,7 @@ h1 a {
   padding: 20px;
   background-color: greenyellow;
 }
+
+.dialog {
+  display: none;
+}
