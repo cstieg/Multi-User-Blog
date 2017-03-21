@@ -48,6 +48,7 @@ class User(db.Model):
     signedUp = db.DateTimeProperty(auto_now_add=True, indexed=True)
 
 class MainPage(Handler):
+    """Displays the main blog page from template mainpage.html"""
     def get(self, q=""):       
         if q:
             entryKey = db.Key.from_path('BlogEntry', int(q))

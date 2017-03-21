@@ -26,7 +26,7 @@ function likePost(postID) {
     url : '/likepost/' + String(postID),
     success: function() {
       // toggle to unlike
-      $('#' + postID + ' .like-button').text = 'Unlike';
+      $('#' + postID + ' .like-button').text('Unlike');
 
       // change onclick to unlike function
       oldFunc = $('#' + postID + ' .like-button').attr('onclick');
@@ -34,8 +34,11 @@ function likePost(postID) {
       $('#' + postID + ' .like-button').attr('onclick', newFunc);
 
       // increment like-count
-      likeCount = Integer($('#' + postID + ' .like-count').text);
-      $('#' + postID + ' .like-count').text = likeCount + 1;
+      likeCount = parseInt($('#' + postID + ' .like-count').text());
+      $('#' + postID + ' .like-count').text(likeCount + 1);
+    },
+    error: function() {
+      alert("Not allowed to like!");
     }
   });
 }
@@ -46,11 +49,19 @@ function unlikePost(postID) {
     url : '/unlikepost/' + String(postID),
     success: function() {
       // toggle to unlike
-      $('#' + postID + ' .like-button').text = 'Like';
+      $('#' + postID + ' .like-button').text('Like');
+
+      // change onclick to like function
+      oldFunc = $('#' + postID + ' .like-button').attr('onclick');
+      newFunc = oldFunc.replace('unlike', 'like');
+      $('#' + postID + ' .like-button').attr('onclick', newFunc);
 
       // increment like-count
-      likeCount = Integer($('#' + postID + ' .like-count').text);
-      $('#' + postID + ' .like-count').text = likeCount - 1;
+      likeCount = parseInt($('#' + postID + ' .like-count').text());
+      $('#' + postID + ' .like-count').text(likeCount - 1);
+    },
+    error: function() {
+      alert("Not allowed to unlike!");
     }
   });
 }
