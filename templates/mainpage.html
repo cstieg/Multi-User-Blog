@@ -38,6 +38,11 @@
             {% endif %}
             <span class="entry-posted">Written on {{entry.posted|date}} by {{entry.author}}</span>
         </div>
+        <div class="comments-section">
+            <form class="write-comment" action="addcomment/{{entry.id}}" method="post">
+                <input name="comment" type="text" placeholder="Type a comment...">
+            </form>
+        </div>
         <hr>
     </article>
     {% endfor %}

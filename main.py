@@ -34,13 +34,17 @@ class Comment(db.Model):
     comment = db.TextProperty(required=True)
     author = db.StringProperty(required=True, indexed=True)
     posted = db.DateTimeProperty(auto_now_add=True, indexed=True)
-    likes = db.IntegerProperty()
+    likes = db.IntegerProperty(default=0, indexed=True)
     
 class PostLike(db.Model):
     blogEntryID = db.IntegerProperty(required=True, indexed=True)
     liker = db.StringProperty(required=True, indexed=True)
     likeTime = db.DateTimeProperty(auto_now_add=True)
-    
+
+class CommentLike(db.Model):
+    commentID = db.IntegerProperty(required=True, indexed=True)
+    liker = db.StringProperty(required=True, indexed=True)
+    likeTime = db.DateTime(auto_now_add=True)
 
 class User(db.Model):
     username = db.StringProperty(required=True, indexed=True)
@@ -196,7 +200,7 @@ class LikePost(Handler):
             # author cannot like
             liker = getUsername(self)
             if liker == blogEntry.author:
-                self.error(401)
+                self.error(403)
                 return
             
             if postIsLiked(blogEntry, liker):
@@ -235,6 +239,67 @@ class UnlikePost(Handler):
             
         else:
             self.error(400)
+
+
+
+class AddComment(Handler):
+    """Add a comment to a particular post"""
+    def post(self, post=""):
+        if not validUserLogin(self):
+            self.redirect("/login")
+        if post:
+            # query post by id passed in
+            entryKey = db.Key.from_path('BlogEntry', int(post))
+            
+            if not entryKey:
+                self.error(400)
+                return
+            blogEntry = db.get(entryKey)
+        else:
+            self.error(400)
+            
+        commentText = self.request.get('comment')
+        userID = getUsername(self)
+        if commentText and userID:
+            addComment(blogEntry, commentText, userID)
+        else:
+            self.error(400)
+        
+class EditComment(Handler):
+    """Edit a comment made by the author on a particular post"""
+    def post(self, post=""):
+        if not validUserLogin(self):
+            self.redirect("/login")
+        if post:
+            # query post by id passed in
+            entryKey = db.Key.from_path('BlogEntry', int(post))
+            
+            if not entryKey:
+                self.error(400)
+                return
+            blogEntry = db.get(entryKey)
+        else:
+            self.error(400)
+            
+            #TODO
+            
+class DeleteComment(Handler):
+    """Delete a comment made by the author on a particular post"""
+    def post(self, post=""):
+        if not validUserLogin(self):
+            self.redirect("/login")
+        if post:
+            # query post by id passed in
+            entryKey = db.Key.from_path('BlogEntry', int(post))
+            
+            if not entryKey:
+                self.error(400)
+                return
+            blogEntry = db.get(entryKey)
+        else:
+            self.error(400)            
+            
+            #TODO
             
 class Signup(Handler):
     def get(self):
@@ -360,9 +425,19 @@ def unlikePost(blogEntry, unliker):
     
 
 def postIsLiked(blogEntry, likerID):
+    """Returns true if a given user (likerID) has liked a given blogEntry"""
     blogEntryID = str(blogEntry.key().id())
     likesQuery = db.GqlQuery("SELECT* FROM PostLike WHERE blogEntryID = %s AND liker = '%s'" % (blogEntryID, likerID))
     return (likesQuery.count() > 0)
+
+@db.transactional(xg=True)
+def addComment(blogEntry, commentText, commenterID):
+    """Adds a comment of commentText by user commenterID to a blogEntry"""
+    newComment = Comment(parent=blogEntry, blogEntryID=blogEntry.key().id(), author=commenterID, comment=commentText)
+    newComment.put()
+    
+    blogEntry.comments += 1
+    blogEntry.put()
     
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/([0-9]+)', MainPage),
@@ -373,7 +448,10 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/deletepost/([0-9]+)', DeletePost),
                                ('/editpost/([0-9]+)', EditPost),
                                ('/likepost/([0-9]+)', LikePost),
-                               ('/unlikepost/([0-9]+)', UnlikePost)
+                               ('/unlikepost/([0-9]+)', UnlikePost),
+                               ('/addcomment/([0-9]+)', AddComment),
+                               ('/deletecomment/([0-9]+)/([0-9]+)', DeleteComment),
+                               ('/editcomment/([0-9]+)/([0-9]+)', EditComment)
                                ], debug=True)
 
 
