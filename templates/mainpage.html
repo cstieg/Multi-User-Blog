@@ -3,14 +3,15 @@
 {% block content %}
 <main>
     {% for entry in blogEntries %}
-    <article class="entry" id="{{entry.key().id()}}">
-        <h2 class="entry-title"><a href="/{{entry.key().id()}}">{{entry.title}}</a></h2>
+    <article class="entry" id="{{entry.id}}">
+        <h2 class="entry-title"><a href="/{{entry.id}}">{{entry.title}}</a></h2>
         <p class="entry-content">{{entry.entry}}</p>
         <div class="entry-footer">
             <div class="likes">
-                <div class="like-button">
-                    Like
-                </div>
+                <button class="like-button" onclick="{% if entry.liked %}unlikePost
+                        {% else %}likePost{% endif %}({{entry.id}})">
+                    {% if entry.liked %} Unlike {% else %} Like {% endif %}
+                </button>
                 <div class="like-count">
                     {{entry.likes}}
                 </div>
@@ -23,11 +24,11 @@
                     {{entry.comments}}
                 </div>
             </div>
-            <form class="edit" action="editpost/{{entry.key().id()}}" method="get">
+            <form class="edit" action="editpost/{{entry.id}}" method="get">
                 <button class="edit-post" type="submit">Edit</button>
             </form>
             <div class="delete">
-                <button class="delete-post" onclick="verifyDeletePost({{entry.key().id()}})">Delete</button>
+                <button class="delete-post" onclick="verifyDeletePost({{entry.id}})">Delete</button>
             </div>
             <span class="entry-posted">Written on {{entry.posted|date}} by {{entry.author}}</span>
         </div>
