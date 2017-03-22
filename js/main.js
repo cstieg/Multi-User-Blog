@@ -3,10 +3,8 @@ function verifyDeletePost(postID) {
   $('#delete-post-dialog [name=delete]').attr('onclick', 'deletePost(' + String(postID) + ')');
 }
 
-
 function deletePost(postID) {
-  $.ajax({
-    type : 'POST',
+  $.post({
     url : '/deletepost/' + String(postID),
     success: function() {
         $('#' + String(postID)).remove();
@@ -21,8 +19,7 @@ function closeDialog() {
 }
 
 function likePost(postID) {
-  $.ajax({
-    type : 'POST',
+  $.post({
     url : '/likepost/' + String(postID),
     success: function() {
       // toggle to unlike
@@ -44,9 +41,8 @@ function likePost(postID) {
 }
 
 function unlikePost(postID) {
-  $.ajax({
-    type : 'POST',
-    url : '/unlikepost/' + String(postID),
+  $.post({
+    url: '/unlikepost/' + String(postID),
     success: function() {
       // toggle to unlike
       $('#' + postID + ' .like-button').text('Like');
@@ -64,4 +60,36 @@ function unlikePost(postID) {
       alert("Not allowed to unlike!");
     }
   });
+}
+
+function addComment(postID) {
+  var commentText = $('#' + String(postID) + ' input[name="comment"]')[0].value
+  $.post({
+    url:  '/addcomment/' + String(postID),
+    data: {'comment': commentText},
+    success: function(response) {
+      // create new comment section without refreshing
+      var comment = JSON.parse(response);
+      var $newCommentSection = $.parseHTML(
+        `<section class="comment" id="${comment.id}">
+            <div class="comment-header">
+                <span class="commenter-id">${comment.author}</span>
+                <span class="comment-date">${comment.posted}</span>
+            </div>
+            <p class="comment-text">
+                ${comment.comment}
+            </p>
+            <br>
+        </section>`
+      );
+      $('#' + String(postID) + ' .comments-section')[0].append($newCommentSection[0]);
+    },
+    error: function() {
+      alert("Sorry, couldn't post comment at this time!");
+    }
+  });
+
+  // clear form and stop submit
+  $('#' + String(postID) + ' input[name="comment"]')[0].value = "";
+  return false;
 }

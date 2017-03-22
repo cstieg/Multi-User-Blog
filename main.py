@@ -1,11 +1,12 @@
 import os
-import time
+import time, datetime
 import webapp2
 import jinja2
 import re
 import logging
 from google.appengine.ext import db
 import hashlib
+import json
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(autoescape=True, loader=jinja2.FileSystemLoader(template_dir))
@@ -26,8 +27,8 @@ class BlogEntry(db.Model):
     entry = db.TextProperty(required=True)
     author = db.StringProperty(required=True, indexed=True)
     posted = db.DateTimeProperty(auto_now_add=True, indexed=True)
-    likes = db.IntegerProperty(default=0, indexed=True)
-    comments = db.IntegerProperty(default=0, indexed=True)
+    likeCount = db.IntegerProperty(default=0, indexed=True)
+    commentCount = db.IntegerProperty(default=0, indexed=True)
 
 class Comment(db.Model):
     blogEntryID = db.IntegerProperty(required=True, indexed=True)
@@ -44,7 +45,7 @@ class PostLike(db.Model):
 class CommentLike(db.Model):
     commentID = db.IntegerProperty(required=True, indexed=True)
     liker = db.StringProperty(required=True, indexed=True)
-    likeTime = db.DateTime(auto_now_add=True)
+    likeTime = db.DateTimeProperty(auto_now_add=True)
 
 class User(db.Model):
     username = db.StringProperty(required=True, indexed=True)
@@ -63,19 +64,27 @@ class MainPage(Handler):
         else:
             blogEntries = db.GqlQuery("SELECT* FROM BlogEntry ORDER BY posted DESC")
     
-        # recreate query in list of objects in order to be able to pass in 'liked' variable    
+        # recreate query in list of objects in order to be able to pass in 'liked' variable            
         userName = getUsername(self)
-        if userName:
-            entryObjects = []
-            for blogEntry in blogEntries:
-                entryObject = {}
-                for field in blogEntry.properties():
-                    entryObject[field] = getattr(blogEntry, field)
-                entryObject['id'] = blogEntry.key().id() 
-                entryObject['liked'] = postIsLiked(blogEntry, userName)
-                entryObjects.append(entryObject)
-            blogEntries = entryObjects
-        
+        entryObjects = []
+        for blogEntry in blogEntries:
+            entryObject = to_dict(blogEntry)
+            entryObject['id'] = blogEntry.key().id()       
+            entryObject['liked'] = postIsLiked(blogEntry, userName)
+                
+            # add in comments
+            commentObjects = []
+            for comment in Comment.all().ancestor(blogEntry).order('posted'):
+                commentObject = to_dict(comment)
+                commentObject['id'] = comment.key().id()
+                #commentObject['liked'] = commentIsLiked(comment, userName)
+                commentObjects.append(commentObject)
+                
+            entryObject['comments'] = commentObjects
+            
+            entryObjects.append(entryObject)
+        blogEntries = entryObjects
+
         self.render("mainpage.html", blogEntries=blogEntries, username=getUsername(self))
         
 class Compose(Handler):
@@ -261,7 +270,10 @@ class AddComment(Handler):
         commentText = self.request.get('comment')
         userID = getUsername(self)
         if commentText and userID:
-            addComment(blogEntry, commentText, userID)
+            newCommentEntity = addComment(blogEntry, commentText, userID)
+            newComment = to_dict(newCommentEntity)
+            newComment['id'] = newCommentEntity.key().id()
+            self.response.out.write(json.dumps(newComment))
         else:
             self.error(400)
         
@@ -408,7 +420,7 @@ def likePost(blogEntry, liker):
     newLike = PostLike(parent=blogEntry, blogEntryID=blogEntry.key().id(), liker=liker)
     newLike.put()
     
-    blogEntry.likes += 1
+    blogEntry.likeCount += 1
     blogEntry.put()
     
 @db.transactional(xg=True)
@@ -420,7 +432,7 @@ def unlikePost(blogEntry, unliker):
     newLike = likesQuery.get()
     newLike.delete()
     
-    blogEntry.likes -= 1
+    blogEntry.likeCount -= 1
     blogEntry.put()
     
 
@@ -436,8 +448,10 @@ def addComment(blogEntry, commentText, commenterID):
     newComment = Comment(parent=blogEntry, blogEntryID=blogEntry.key().id(), author=commenterID, comment=commentText)
     newComment.put()
     
-    blogEntry.comments += 1
+    blogEntry.commentCount += 1
     blogEntry.put()
+    
+    return newComment
     
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/([0-9]+)', MainPage),
@@ -455,3 +469,33 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ], debug=True)
 
 
+
+
+
+
+# originally written by 'dmw' (http://stackoverflow.com/questions/1531501/json-serialization-of-google-app-engine-models)
+# slight modifications made
+SIMPLE_TYPES = (int, long, float, bool, dict, basestring, list)
+
+def to_dict(model):
+    output = {}
+
+    for key, prop in model.properties().iteritems():
+        value = getattr(model, key)
+
+        if value is None or isinstance(value, SIMPLE_TYPES):
+            output[key] = value
+        elif isinstance(value, datetime.date):
+            # Convert date/datetime to MILLISECONDS-since-epoch (JS "new Date()").
+            #ms = time.mktime(value.utctimetuple()) * 1000
+            #ms += getattr(value, 'microseconds', 0) / 1000
+            #output[key] = int(ms)
+            output[key] = value.isoformat()
+        elif isinstance(value, db.GeoPt):
+            output[key] = {'lat': value.lat, 'lon': value.lon}
+        elif isinstance(value, db.Model):
+            output[key] = to_dict(value)
+        else:
+            raise ValueError('cannot encode ' + repr(prop))
+
+    return output

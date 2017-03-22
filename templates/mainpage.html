@@ -6,7 +6,7 @@
     <article class="entry" id="{{entry.id}}">
         <h2 class="entry-title"><a href="/{{entry.id}}">{{entry.title}}</a></h2>
         <p class="entry-content">{{entry.entry}}</p>
-        <div class="entry-footer">
+        <section class="entry-footer">
             <div class="likes">
                 {% if entry.author != username %}
                 <button class="like-button" onclick="{% if entry.liked %}unlikePost
@@ -17,7 +17,7 @@
                     Likes:
                 {% endif %}
                 <div class="like-count">
-                    {{entry.likes}}
+                    {{entry.likeCount}}
                 </div>
             </div>
             <div class="comments">
@@ -25,7 +25,7 @@
                     Comments
                 </div>
                 <div class="comment-count">
-                    {{entry.comments}}
+                    {{entry.commentCount}}
                 </div>
             </div>
             {% if entry.author == username %}
@@ -36,13 +36,28 @@
                 <button class="delete-post" onclick="verifyDeletePost({{entry.id}})">Delete</button>
             </div>
             {% endif %}
-            <span class="entry-posted">Written on {{entry.posted|date}} by {{entry.author}}</span>
-        </div>
-        <div class="comments-section">
-            <form class="write-comment" action="addcomment/{{entry.id}}" method="post">
+            <span class="entry-posted">Written on {{entry.posted}} by {{entry.author}}</span>
+        </section>
+        <section class="comments-section">
+            <form class="write-comment" onsubmit="return addComment({{entry.id}});">
                 <input name="comment" type="text" placeholder="Type a comment...">
             </form>
-        </div>
+            {% for comment in entry.comments %}
+                <!-- If modifying this code, be sure to make
+                     corresponding modifications to the addComment
+                     function in main.js -->
+                <section class="comment" id="{{comment.id}}">
+                    <div class="comment-header">
+                        <span class="commenter-id">{{comment.author}}</span>
+                        <span class="comment-date">{{comment.posted}}</span>
+                    </div>
+                    <p class="comment-text">
+                        {{comment.comment}}
+                    </p>
+                    <br>
+                </section>
+            {% endfor %}
+        </section>
         <hr>
     </article>
     {% endfor %}
@@ -59,6 +74,10 @@
         </p>
         <button name="delete" onclick="">Delete</button>
         <button name="cancel" onclick="closeDialog()">Cancel</button>
+
+</div>
+
+<div class="no-display" id="comment-template">
 
 </div>
 
