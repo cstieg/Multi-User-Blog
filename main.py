@@ -2,7 +2,6 @@
 manage one's own entries, view and comment on the entries, and like other
 author's entries and comments"""
 
-import os
 import webapp2
 
 from entryView import MainPage, Compose, DeletePost, EditPost

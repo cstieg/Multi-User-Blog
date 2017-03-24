@@ -72,13 +72,18 @@ function addComment(postID) {
       var comment = JSON.parse(response);
       var $newCommentSection = $.parseHTML(
         `<section class="comment" id="${comment.id}">
-            <div class="comment-header">
-                <span class="commenter-id">${comment.author}</span>
-                <span class="comment-date">${comment.posted}</span>
-            </div>
             <p class="comment-text">
                 ${comment.comment}
             </p>
+            <div class="comment-footer">
+                <div class="comment-likes">
+                    <span class="like-comment-button">👍</span>
+                    <span class="comment-like-count">${comment.likes}</span>
+                </div>
+                <button class="edit-comment">Edit</button>
+                <button class="delete-comment" onclick="deleteComment(${comment.id}, ${postID})">Delete</button>
+                <span class="comment-posted">Written on ${comment.posted} by ${comment.author}</span>
+            </div>
             <br>
         </section>`
       );
@@ -92,4 +97,16 @@ function addComment(postID) {
   // clear form and stop submit
   $('#' + String(postID) + ' input[name="comment"]')[0].value = "";
   return false;
+}
+
+function deleteComment(commentID, entryID) {
+  $.post({
+    url: '/deletecomment/' + String(commentID) + '/' + String(entryID),
+    success: function() {
+      $('#' + String(commentID)).remove();
+      var $commentCount = $('#' + String(entryID) + ' .comment-count')[0];
+      var commentCount = parseInt($commentCount.innerText);
+      $commentCount.innerText = commentCount - 1;
+    }
+  });
 }

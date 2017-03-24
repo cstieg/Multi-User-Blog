@@ -62,7 +62,8 @@ def postIsLiked(blogEntry, likerID):
 
 @db.transactional(xg=True)
 def addComment(blogEntry, commentText, commenterID):
-    """Adds a comment of commentText by user commenterID to a blogEntry"""
+    """Adds a comment of commentText by user commenterID to a blogEntry
+    and increments the comment count on the entry"""
     newComment = Comment(parent=blogEntry, blogEntryID=blogEntry.key().id(), author=commenterID, comment=commentText)
     newComment.put()
     
@@ -70,6 +71,14 @@ def addComment(blogEntry, commentText, commenterID):
     blogEntry.put()
     
     return newComment
+
+@db.transactional(xg=True)
+def deleteComment(commentEntity, parentEntity):
+    """Deletes a comment on a blog entry and decrements the comment count on the entry"""
+    parentEntity.commentCount -= 1
+    parentEntity.put()
+    
+    commentEntity.delete()
 
 def validUserLogin(handler):
     username = handler.request.cookies.get("username")
