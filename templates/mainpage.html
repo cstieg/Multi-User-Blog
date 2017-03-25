@@ -6,6 +6,7 @@
     <article class="entry" id="{{entry.id}}">
         <h2 class="entry-title"><a href="/{{entry.id}}">{{entry.title}}</a></h2>
         <p class="entry-content">{{entry.entry}}</p>
+
         <section class="entry-footer">
             <div class="likes">
                 {% if entry.author != username %}
@@ -28,7 +29,7 @@
                 {% endif %}
                 <span class="like-count">{{entry.likeCount}}</span>
             </div>
-            <div class="comments" onclick="toggleComment({{entry.id}})">
+            <div class="comments" onclick="return toggleComment({{entry.id}});">
                 <button class="comment-button">
                     💬 Comment
                 </button>
@@ -44,9 +45,10 @@
             {% endif %}
             <span class="entry-posted">Written on {{entry.posted}} by {{entry.author}}</span>
         </section>
+
         <section class="comments-section no-display">
             <form class="write-comment" onsubmit="return addComment({{entry.id}}, '{{username}}');">
-                <input name="comment" type="text" placeholder="Type a comment...">
+                <textarea name="comment" type="text" placeholder="Type a comment, hit enter to submit..."></textarea>
             </form>
             {% for comment in entry.comments %}
                 <!-- If modifying this code, be sure to make
@@ -56,6 +58,7 @@
                     <p class="comment-text">
                         {{comment.comment}}
                     </p>
+
                     <div class="comment-footer">
                         <div class="comment-likes">
                             {% if comment.author == username %}
@@ -76,11 +79,10 @@
                                   {% endif %}
                                 </button>
                             {% endif %}
-
                             <span class="like-comment-count">{{comment.likeCount}}</span>
                         </div>
-                        <button class="edit-comment" onclick="editCommentInput({{comment.id}}, {{entry.id}})">Edit</button>
-                        <button class="delete-comment" onclick="deleteComment({{comment.id}}, {{entry.id}})">Delete</button>
+                        <button class="comment-edit" onclick="editCommentInput({{comment.id}}, {{entry.id}})">Edit</button>
+                        <button class="comment-delete" onclick="deleteComment({{comment.id}}, {{entry.id}})">Delete</button>
                         <span class="comment-posted">Written on {{comment.posted}} by {{comment.author}}</span>
                     </div>
                     <br>

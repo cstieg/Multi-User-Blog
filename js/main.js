@@ -72,6 +72,13 @@ function toggleComment(entryID) {
   var $commentsSection = $('#' + entryID + ' .comments-section');
   if ($commentsSection.hasClass('no-display')) {
     $commentsSection.removeClass('no-display');
+    // make textarea submit on enter
+    $commentsSection.find('textarea').keypress(function(e) {
+      if(e.which == 13) {
+        $commentsSection.find('form').submit();
+        return false;
+      }
+    });
   }
   else {
     $commentsSection.addClass('no-display');
@@ -79,7 +86,8 @@ function toggleComment(entryID) {
 }
 
 function addComment(entryID, username) {
-  var commentText = $('#' + String(entryID) + ' input[name="comment"]')[0].value
+  var $newCommentTextarea = $('#' + String(entryID) + ' textarea')[0];
+  var commentText = $newCommentTextarea.value;
   $.post({
     url:  '/addcomment/' + String(entryID),
     data: {'comment': commentText},
@@ -95,7 +103,7 @@ function addComment(entryID, username) {
   });
 
   // clear form and stop submit
-  $('#' + String(entryID) + ' input[name="comment"]')[0].value = "";
+  $newCommentTextarea.value = '';
   return false;
 }
 
