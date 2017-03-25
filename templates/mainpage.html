@@ -9,12 +9,22 @@
         <section class="entry-footer">
             <div class="likes">
                 {% if entry.author != username %}
-                <button class="like-button" onclick="{% if entry.liked %}unlikePost
-                        {% else %}likePost{% endif %}({{entry.id}})">
-                    👍 {% if entry.liked %} Unlike {% else %} Like {% endif %}
+                <button class="like-button" onclick="
+                    {% if entry.liked %}
+                        unlikePost
+                    {% else %}
+                        likePost
+                    {% endif %}
+                    ({{entry.id}})">
+                    👍
+                    {% if entry.liked %}
+                        Unlike
+                    {% else %}
+                        Like
+                    {% endif %}
                 </button>
                 {% else %}
-                    👍 Likes:
+                    <span class="like-label">👍 Likes:</span>
                 {% endif %}
                 <span class="like-count">{{entry.likeCount}}</span>
             </div>
@@ -49,23 +59,24 @@
                     <div class="comment-footer">
                         <div class="comment-likes">
                             {% if comment.author == username %}
-                            <span class="like-comment-button">
+                                <span class="like-comment-label">👍 Likes: </span>
                             {% else %}
-                                  <span class="like-comment-button" onclick="
+                                <button class="like-comment-button" onclick="
                                   {% if comment.liked %}
                                     unlikeComment
                                   {% else %}
                                     likeComment
                                   {% endif %}
                                   ({{comment.id}}, {{entry.id}})">
+                                  👍
+                                  {% if comment.liked %}
+                                      Unlike
+                                  {% else %}
+                                      Like
+                                  {% endif %}
+                                </button>
                             {% endif %}
-                            👍
-                            {% if comment.liked %}
-                                Unlike
-                            {% else %}
-                                Like
-                            {% endif %}
-                            </span>
+
                             <span class="like-comment-count">{{comment.likeCount}}</span>
                         </div>
                         <button class="edit-comment" onclick="editCommentInput({{comment.id}}, {{entry.id}})">Edit</button>
