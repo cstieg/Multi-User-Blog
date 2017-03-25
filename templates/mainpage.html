@@ -51,10 +51,17 @@
                     </p>
                     <div class="comment-footer">
                         <div class="comment-likes">
-                            <span class="like-comment-button">👍</span>
-                            <span class="comment-like-count">{{comment.likes}}</span>
+                            {% if comment.author == username %}
+                            <span class="like-comment-button">
+                            {% else %}
+                            <span class="like-comment-button"
+                                  onclick="{% if comment.liked %}unlikeComment
+                                    {% else %}likeComment{% endif %}({{comment.id}}, {{entry.id}})">
+                            {% endif %}
+                            👍</span>
+                            <span class="like-comment-count">{{comment.likeCount}}</span>
                         </div>
-                        <button class="edit-comment">Edit</button>
+                        <button class="edit-comment" onclick="editCommentInput({{comment.id}}, {{entry.id}})">Edit</button>
                         <button class="delete-comment" onclick="deleteComment({{comment.id}}, {{entry.id}})">Delete</button>
                         <span class="comment-posted">Written on {{comment.posted}} by {{comment.author}}</span>
                     </div>
@@ -72,17 +79,18 @@
 </footer>
 
 <div class="dialog" id="delete-post-dialog" title="Delete Post?">
-
-        <p class="message">
-            Delete this post?  This action cannot be reversed.
-        </p>
-        <button name="delete" onclick="">Delete</button>
-        <button name="cancel" onclick="closeDialog()">Cancel</button>
-
+    <p class="message">
+        Delete this post?  This action cannot be reversed.
+    </p>
+    <button name="delete" onclick="">Delete</button>
+    <button name="cancel" onclick="closeDialog(this)">Cancel</button>
 </div>
 
-<div class="no-display" id="comment-template">
-
+<div class="dialog" id="edit-comment-dialog" title="Edit Comment">
+    <form onsubmit="">
+        <input name="comment" type="text" value="">
+        <button type="submit">Save changes</button>
+        <button onclick="closeDialog(this)">Cancel</button>
+    </form>
 </div>
-
 {% endblock content %}

@@ -2,7 +2,7 @@ import time
 from google.appengine.ext import db
 
 from handler import Handler
-from model import getUsername, validUserLogin, postIsLiked, BlogEntry, Comment
+from model import getUsername, validUserLogin, postIsLiked, commentIsLiked, BlogEntry, Comment
 from utils import to_dict
 
 
@@ -31,7 +31,7 @@ class MainPage(Handler):
             for comment in Comment.all().ancestor(blogEntry).order('posted'):
                 commentDict = to_dict(comment)
                 commentDict['id'] = comment.key().id()
-                #commentObject['liked'] = commentIsLiked(comment, userName)
+                commentDict['liked'] = commentIsLiked(comment, userName)
                 commentList.append(commentDict)
                 
             entryDict['comments'] = commentList

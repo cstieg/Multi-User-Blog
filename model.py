@@ -1,3 +1,4 @@
+import logging
 import hashlib
 from google.appengine.ext import db
 
@@ -16,7 +17,7 @@ class Comment(db.Model):
     comment = db.TextProperty(required=True)
     author = db.StringProperty(required=True, indexed=True)
     posted = db.DateTimeProperty(auto_now_add=True, indexed=True)
-    likes = db.IntegerProperty(default=0, indexed=True)
+    likeCount = db.IntegerProperty(default=0, indexed=True)
     
 class PostLike(db.Model):
     blogEntryID = db.IntegerProperty(required=True, indexed=True)
@@ -48,8 +49,8 @@ def unlikePost(blogEntry, unliker):
     likesQuery = PostLike.all()
     likesQuery.ancestor(blogEntry)
     likesQuery.filter('liker =', unliker)
-    newLike = likesQuery.get()
-    newLike.delete()
+    like = likesQuery.get()
+    like.delete()
     
     blogEntry.likeCount -= 1
     blogEntry.put()
@@ -59,6 +60,35 @@ def postIsLiked(blogEntry, likerID):
     blogEntryID = str(blogEntry.key().id())
     likesQuery = db.GqlQuery("SELECT* FROM PostLike WHERE blogEntryID = %s AND liker = '%s'" % (blogEntryID, likerID))
     return (likesQuery.count() > 0)
+
+def commentIsLiked(commentEntity, likerID):
+    """Returns true if a given user (likerID) has liked a given comment"""
+    commentID = str(commentEntity.key().id())
+    likesQuery = CommentLike.all()
+    likesQuery.ancestor(commentEntity)
+    likesQuery.filter('liker =', likerID)
+    return (likesQuery.count() > 0)
+
+@db.transactional(xg=True)
+def likeComment(commentEntity, liker):
+    """Adds a CommentLike entity and increments the like count for the Comment entity"""
+    newLike = CommentLike(parent=commentEntity, commentID=commentEntity.key().id(), liker=liker)
+    newLike.put()
+    
+    commentEntity.likeCount += 1
+    commentEntity.put()
+
+@db.transactional(xg=True)
+def unlikeComment(commentEntity, unliker):
+    """Deletes a CommentLike entity and decrements the like count for the Comment entity"""
+    likesQuery = CommentLike.all()
+    likesQuery.ancestor(commentEntity)
+    likesQuery.filter('liker =', unliker)
+    like = likesQuery.get()
+    like.delete()
+    
+    commentEntity.likeCount -= 1
+    commentEntity.put()
 
 @db.transactional(xg=True)
 def addComment(blogEntry, commentText, commenterID):
@@ -79,6 +109,12 @@ def deleteComment(commentEntity, parentEntity):
     parentEntity.put()
     
     commentEntity.delete()
+
+def editComment(commentEntity, newCommentText):
+    """Edits a comment on a blog entry"""
+    commentEntity.comment = newCommentText
+    commentEntity.put()
+    return commentEntity
 
 def validUserLogin(handler):
     username = handler.request.cookies.get("username")

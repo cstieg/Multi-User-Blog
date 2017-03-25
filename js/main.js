@@ -1,38 +1,41 @@
-function verifyDeletePost(postID) {
+function verifyDeletePost(entryID) {
   $('#delete-post-dialog').dialog();
-  $('#delete-post-dialog [name=delete]').attr('onclick', 'deletePost(' + String(postID) + ')');
+  $('#delete-post-dialog [name=delete]').attr('onclick', 'deletePost(' + String(entryID) + ')');
 }
 
-function deletePost(postID) {
+function deletePost(entryID) {
   $.post({
-    url : '/deletepost/' + String(postID),
+    url : '/deletepost/' + String(entryID),
     success: function() {
-        $('#' + String(postID)).remove();
+        $('#' + String(entryID)).remove();
         $('#delete-post-dialog').dialog('close');
         alert('Post deleted!');
     }
   });
 }
 
-function closeDialog() {
-  $('.dialog').dialog('close');
+function closeDialog(dialogButton) {
+  var dialogDiv = $(dialogButton).closest('div');
+  dialogDiv.dialog('close');
 }
 
-function likePost(postID) {
+function likePost(entryID) {
   $.post({
-    url : '/likepost/' + String(postID),
+    url : '/likepost/' + String(entryID),
     success: function() {
+      var $likeButton = $('#' + entryID + ' .like-button');
+      var $likeCount = $('#' + entryID + ' .like-count');
       // toggle to unlike
-      $('#' + postID + ' .like-button').text('Unlike');
+      $likeButton.text('Unlike');
 
       // change onclick to unlike function
-      oldFunc = $('#' + postID + ' .like-button').attr('onclick');
+      oldFunc = $likeButton.attr('onclick');
       newFunc = oldFunc.replace('like', 'unlike');
-      $('#' + postID + ' .like-button').attr('onclick', newFunc);
+      $likeButton.attr('onclick', newFunc);
 
       // increment like-count
-      likeCount = parseInt($('#' + postID + ' .like-count').text());
-      $('#' + postID + ' .like-count').text(likeCount + 1);
+      likeCount = parseInt($likeCount.text());
+      $likeCount.text(likeCount + 1);
     },
     error: function() {
       alert("Not allowed to like!");
@@ -40,21 +43,24 @@ function likePost(postID) {
   });
 }
 
-function unlikePost(postID) {
+function unlikePost(entryID) {
   $.post({
-    url: '/unlikepost/' + String(postID),
+    url: '/unlikepost/' + String(entryID),
     success: function() {
+      var $likeButton = $('#' + entryID + ' .like-button');
+      var $likeCount = $('#' + entryID + ' .like-count');
+
       // toggle to unlike
-      $('#' + postID + ' .like-button').text('Like');
+      $likeButton.text('Like');
 
       // change onclick to like function
-      oldFunc = $('#' + postID + ' .like-button').attr('onclick');
+      oldFunc = $likeButton.attr('onclick');
       newFunc = oldFunc.replace('unlike', 'like');
-      $('#' + postID + ' .like-button').attr('onclick', newFunc);
+      $likeButton.attr('onclick', newFunc);
 
       // increment like-count
-      likeCount = parseInt($('#' + postID + ' .like-count').text());
-      $('#' + postID + ' .like-count').text(likeCount - 1);
+      likeCount = parseInt(likeCount.text());
+      $likeCount.text(likeCount - 1);
     },
     error: function() {
       alert("Not allowed to unlike!");
@@ -62,32 +68,16 @@ function unlikePost(postID) {
   });
 }
 
-function addComment(postID) {
-  var commentText = $('#' + String(postID) + ' input[name="comment"]')[0].value
+function addComment(entryID) {
+  var commentText = $('#' + String(entryID) + ' input[name="comment"]')[0].value
   $.post({
-    url:  '/addcomment/' + String(postID),
+    url:  '/addcomment/' + String(entryID),
     data: {'comment': commentText},
     success: function(response) {
       // create new comment section without refreshing
       var comment = JSON.parse(response);
-      var $newCommentSection = $.parseHTML(
-        `<section class="comment" id="${comment.id}">
-            <p class="comment-text">
-                ${comment.comment}
-            </p>
-            <div class="comment-footer">
-                <div class="comment-likes">
-                    <span class="like-comment-button">👍</span>
-                    <span class="comment-like-count">${comment.likes}</span>
-                </div>
-                <button class="edit-comment">Edit</button>
-                <button class="delete-comment" onclick="deleteComment(${comment.id}, ${postID})">Delete</button>
-                <span class="comment-posted">Written on ${comment.posted} by ${comment.author}</span>
-            </div>
-            <br>
-        </section>`
-      );
-      $('#' + String(postID) + ' .comments-section')[0].append($newCommentSection[0]);
+      var $newCommentSection = commentSectionHTML(comment, entryID);
+      $('#' + String(entryID) + ' .comments-section')[0].append($newCommentSection[0]);
     },
     error: function() {
       alert("Sorry, couldn't post comment at this time!");
@@ -95,7 +85,7 @@ function addComment(postID) {
   });
 
   // clear form and stop submit
-  $('#' + String(postID) + ' input[name="comment"]')[0].value = "";
+  $('#' + String(entryID) + ' input[name="comment"]')[0].value = "";
   return false;
 }
 
@@ -107,6 +97,103 @@ function deleteComment(commentID, entryID) {
       var $commentCount = $('#' + String(entryID) + ' .comment-count')[0];
       var commentCount = parseInt($commentCount.innerText);
       $commentCount.innerText = commentCount - 1;
+    }
+  });
+}
+
+function editCommentInput(commentID, entryID) {
+  var $commentText = $('#' + commentID + ' .comment-text')[0];
+  var commentText = $commentText.innerText;
+  var onSubmitFunction = function() {
+    return editComment(commentID, entryID);
+  }
+  $('#edit-comment-dialog form').on('submit', onSubmitFunction);
+  $('#edit-comment-dialog [name=comment]').attr('value', commentText);
+  $('#edit-comment-dialog').dialog();
+}
+
+function editComment(commentID, entryID) {
+  var commentTextField = $('#edit-comment-dialog [name=comment]');
+  var commentText = commentTextField[0].value;
+  $.post({
+    url: '/editcomment/' + String(commentID) + '/' + String(entryID),
+    data: {'comment': commentText},
+    success: function() {
+      $('#' + commentID + ' .comment-text')[0].innerText = commentText;
+    },
+    error: function() {
+      alert('Could not edit comment!');
+    }
+  });
+  closeDialog(commentTextField);
+  return false;
+}
+
+function commentSectionHTML(comment, entryID) {
+  return $.parseHTML(
+    `<section class="comment" id="${comment.id}">
+        <p class="comment-text">
+            ${comment.comment}
+        </p>
+        <div class="comment-footer">
+            <div class="comment-likes">
+                <span class="like-comment-button">👍</span>
+                <span class="like-comment-count">${comment.likeCount}</span>
+            </div>
+            <button class="edit-comment">Edit</button>
+            <button class="delete-comment" onclick="deleteComment(${comment.id}, ${entryID})">Delete</button>
+            <span class="comment-posted">Written on ${comment.posted} by ${comment.author}</span>
+        </div>
+        <br>
+    </section>`
+  );
+}
+
+function likeComment(commentID, entryID) {
+  $.post({
+    url : '/likecomment/' + String(commentID) + '/' + String(entryID),
+    success: function() {
+      var $likeButton = $('#' + commentID + ' .like-comment-button');
+      var $likeCount = $('#' + commentID + ' .like-comment-count');
+      // toggle to unlike
+      $likeButton.text('Unlike');
+
+      // change onclick to unlike function
+      oldFunc = $likeButton.attr('onclick');
+      newFunc = oldFunc.replace('like', 'unlike');
+      $likeButton.attr('onclick', newFunc);
+
+      // increment like-count
+      likeCount = parseInt($likeCount.text());
+      $likeCount.text(likeCount + 1);
+    },
+    error: function() {
+      alert("Not allowed to like!");
+    }
+  });
+}
+
+function unlikeComment(commentID, entryID) {
+  $.post({
+    url: '/unlikecomment/' + String(commentID) + '/' + String(entryID),
+    success: function() {
+      var $likeButton = $('#' + commentID + ' .like-comment-button');
+      var $likeCount = $('#' + commentID + ' .like-comment-count');
+
+      // toggle to unlike
+      $likeButton.text('Like');
+
+      // change onclick to like function
+      oldFunc = $likeButton.attr('onclick');
+      newFunc = oldFunc.replace('unlike', 'like');
+      $likeButton.attr('onclick', newFunc);
+
+      // increment like-count
+      likeCount = parseInt($likeCount.text());
+      $likeCount.text(likeCount - 1);
+    },
+    error: function() {
+      alert("Not allowed to unlike!");
     }
   });
 }

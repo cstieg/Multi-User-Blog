@@ -7,7 +7,7 @@ import webapp2
 from entryView import MainPage, Compose, DeletePost, EditPost
 from commentView import AddComment, DeleteComment, EditComment
 from loginView import Signup, Login, Logout
-from likeView import LikePost, UnlikePost
+from likeView import LikePost, UnlikePost, LikeComment, UnlikeComment
 
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/([0-9]+)', MainPage),
@@ -21,6 +21,8 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/unlikepost/([0-9]+)', UnlikePost),
                                ('/addcomment/([0-9]+)', AddComment),
                                ('/deletecomment/([0-9]+)/([0-9]+)', DeleteComment),
-                               ('/editcomment/([0-9]+)/([0-9]+)', EditComment)
+                               ('/editcomment/([0-9]+)/([0-9]+)', EditComment),
+                               ('/likecomment/([0-9]+)/([0-9]+)', LikeComment),
+                               ('/unlikecomment/([0-9]+)/([0-9]+)', UnlikeComment)
                                ], debug=True)
 

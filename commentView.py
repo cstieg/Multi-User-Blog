@@ -5,7 +5,7 @@ from google.appengine.ext import db
 
 from handler import Handler
 from model import (BlogEntry, Comment, validUserLogin, getUsername, addComment, 
-                   deleteComment)
+                   editComment, deleteComment)
 from utils import to_dict
 
 class AddComment(Handler):
@@ -36,21 +36,28 @@ class AddComment(Handler):
         
 class EditComment(Handler):
     """Edit a comment made by the author on a particular post"""
-    def post(self, postID=""):
+    def post(self, commentID="", parentID=""):
         if not validUserLogin(self):
             self.redirect("/login")
-        if postID:
+        commentText = self.request.get('comment')
+        if commentID and parentID and commentText:
             # query post by id passed in
-            entryKey = db.Key.from_path('BlogEntry', int(postID))
-
-            if not entryKey:
+            parentKey = BlogEntry.get_by_id(int(parentID)).key()
+            parentEntity = db.get(parentKey)
+            commentEntity = Comment.get_by_id(int(commentID), parent=parentKey)
+            if not commentEntity or not parentEntity:
                 self.error(400)
                 return
-            blogEntry = db.get(entryKey)
-        else:
-            self.error(400)
 
-            #TODO
+            # only author can edit
+            userID = getUsername(self)
+            if commentEntity.author == userID:
+                 editComment(commentEntity, commentText)
+            else:
+                self.error(401)
+        else:
+            self.error(400)            
+            
             
 class DeleteComment(Handler):
     """Delete a comment made by the author on a particular post"""
@@ -68,8 +75,6 @@ class DeleteComment(Handler):
 
             # only author can delete
             userID = getUsername(self)
-            logging.info(commentEntity.author)
-            logging.info(userID)
             if commentEntity.author == userID:
                 deleteComment(commentEntity, parentEntity)
             else:
