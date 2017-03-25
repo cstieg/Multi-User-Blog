@@ -1,6 +1,8 @@
 /*DOCUMENT**********************************************************/
 html {
   background-color: khaki;
+  max-width: 1024px;
+  margin: auto;
 }
 
 .invalid {
@@ -60,6 +62,7 @@ h2 {
   background-color: tan;
   border: solid black thin;
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
 }
 
@@ -67,6 +70,7 @@ h2 {
   background-color: palegoldenrod;
   border: solid black thin;
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   font-size: 11pt;
 }
