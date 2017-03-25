@@ -26,7 +26,7 @@ function likePost(entryID) {
       var $likeButton = $('#' + entryID + ' .like-button');
       var $likeCount = $('#' + entryID + ' .like-count');
       // toggle to unlike
-      $likeButton.text('Unlike');
+      $likeButton.text('👍 Unlike');
 
       // change onclick to unlike function
       oldFunc = $likeButton.attr('onclick');
@@ -51,7 +51,7 @@ function unlikePost(entryID) {
       var $likeCount = $('#' + entryID + ' .like-count');
 
       // toggle to unlike
-      $likeButton.text('Like');
+      $likeButton.text('👍 Like');
 
       // change onclick to like function
       oldFunc = $likeButton.attr('onclick');
@@ -59,7 +59,7 @@ function unlikePost(entryID) {
       $likeButton.attr('onclick', newFunc);
 
       // increment like-count
-      likeCount = parseInt(likeCount.text());
+      likeCount = parseInt($likeCount.text());
       $likeCount.text(likeCount - 1);
     },
     error: function() {
@@ -68,7 +68,17 @@ function unlikePost(entryID) {
   });
 }
 
-function addComment(entryID) {
+function toggleComment(entryID) {
+  var $commentsSection = $('#' + entryID + ' .comments-section');
+  if ($commentsSection.hasClass('no-display')) {
+    $commentsSection.removeClass('no-display');
+  }
+  else {
+    $commentsSection.addClass('no-display');
+  }
+}
+
+function addComment(entryID, username) {
   var commentText = $('#' + String(entryID) + ' input[name="comment"]')[0].value
   $.post({
     url:  '/addcomment/' + String(entryID),
@@ -76,7 +86,7 @@ function addComment(entryID) {
     success: function(response) {
       // create new comment section without refreshing
       var comment = JSON.parse(response);
-      var $newCommentSection = commentSectionHTML(comment, entryID);
+      var $newCommentSection = commentSectionHTML(comment, entryID, username);
       $('#' + String(entryID) + ' .comments-section')[0].append($newCommentSection[0]);
     },
     error: function() {
@@ -129,24 +139,36 @@ function editComment(commentID, entryID) {
   return false;
 }
 
-function commentSectionHTML(comment, entryID) {
-  return $.parseHTML(
-    `<section class="comment" id="${comment.id}">
+function commentSectionHTML(comment, entryID, username) {
+  var commentHTML =
+  `<section class="comment" id="${comment.id}">
         <p class="comment-text">
             ${comment.comment}
         </p>
         <div class="comment-footer">
             <div class="comment-likes">
-                <span class="like-comment-button">👍</span>
+                <span class="like-comment-button"`;
+    if (comment.author != username) {
+      commentHTML += ` onclick="`;
+      if (comment.liked) {
+        commentHTML += `unlikeComment`;
+      }
+      else {
+        commentHTML += `likeComment`;
+      }
+      commentHTML += `({{comment.id}}, {{entry.id}})">`;
+    }
+    commentHTML += `👍</span>
                 <span class="like-comment-count">${comment.likeCount}</span>
             </div>
-            <button class="edit-comment">Edit</button>
+            <button class="edit-comment" onclick="editCommentInput(${comment.id}, ${entryID})">Edit</button>
             <button class="delete-comment" onclick="deleteComment(${comment.id}, ${entryID})">Delete</button>
             <span class="comment-posted">Written on ${comment.posted} by ${comment.author}</span>
         </div>
         <br>
-    </section>`
-  );
+    </section>`;
+
+    return $.parseHTML(commentHTML);
 }
 
 function likeComment(commentID, entryID) {
@@ -156,7 +178,7 @@ function likeComment(commentID, entryID) {
       var $likeButton = $('#' + commentID + ' .like-comment-button');
       var $likeCount = $('#' + commentID + ' .like-comment-count');
       // toggle to unlike
-      $likeButton.text('Unlike');
+      $likeButton.text('👍 Unlike');
 
       // change onclick to unlike function
       oldFunc = $likeButton.attr('onclick');
@@ -181,7 +203,7 @@ function unlikeComment(commentID, entryID) {
       var $likeCount = $('#' + commentID + ' .like-comment-count');
 
       // toggle to unlike
-      $likeButton.text('Like');
+      $likeButton.text('👍 Like');
 
       // change onclick to like function
       oldFunc = $likeButton.attr('onclick');

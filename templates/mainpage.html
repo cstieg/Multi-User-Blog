@@ -8,24 +8,21 @@
         <p class="entry-content">{{entry.entry}}</p>
         <section class="entry-footer">
             <div class="likes">
-                👍
                 {% if entry.author != username %}
                 <button class="like-button" onclick="{% if entry.liked %}unlikePost
                         {% else %}likePost{% endif %}({{entry.id}})">
-                    {% if entry.liked %} Unlike {% else %} Like {% endif %}
+                    👍 {% if entry.liked %} Unlike {% else %} Like {% endif %}
                 </button>
                 {% else %}
-                    Likes:
+                    👍 Likes:
                 {% endif %}
                 <span class="like-count">{{entry.likeCount}}</span>
             </div>
-            <div class="comments">
-                <div class="comment-button">
-                    Comments
-                </div>
-                <div class="comment-count">
-                    {{entry.commentCount}}
-                </div>
+            <div class="comments" onclick="toggleComment({{entry.id}})">
+                <button class="comment-button">
+                    💬 Comment
+                </button>
+                <span class="comment-count">{{entry.commentCount}}</span>
             </div>
             {% if entry.author == username %}
             <form class="edit" action="editpost/{{entry.id}}" method="get">
@@ -37,8 +34,8 @@
             {% endif %}
             <span class="entry-posted">Written on {{entry.posted}} by {{entry.author}}</span>
         </section>
-        <section class="comments-section">
-            <form class="write-comment" onsubmit="return addComment({{entry.id}});">
+        <section class="comments-section no-display">
+            <form class="write-comment" onsubmit="return addComment({{entry.id}}, '{{username}}');">
                 <input name="comment" type="text" placeholder="Type a comment...">
             </form>
             {% for comment in entry.comments %}
@@ -54,11 +51,21 @@
                             {% if comment.author == username %}
                             <span class="like-comment-button">
                             {% else %}
-                            <span class="like-comment-button"
-                                  onclick="{% if comment.liked %}unlikeComment
-                                    {% else %}likeComment{% endif %}({{comment.id}}, {{entry.id}})">
+                                  <span class="like-comment-button" onclick="
+                                  {% if comment.liked %}
+                                    unlikeComment
+                                  {% else %}
+                                    likeComment
+                                  {% endif %}
+                                  ({{comment.id}}, {{entry.id}})">
                             {% endif %}
-                            👍</span>
+                            👍
+                            {% if comment.liked %}
+                                Unlike
+                            {% else %}
+                                Like
+                            {% endif %}
+                            </span>
                             <span class="like-comment-count">{{comment.likeCount}}</span>
                         </div>
                         <button class="edit-comment" onclick="editCommentInput({{comment.id}}, {{entry.id}})">Edit</button>
