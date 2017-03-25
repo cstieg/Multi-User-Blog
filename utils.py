@@ -25,7 +25,7 @@ def to_dict(model):
             #ms = time.mktime(value.utctimetuple()) * 1000
             #ms += getattr(value, 'microseconds', 0) / 1000
             #output[key] = int(ms)
-            output[key] = value.isoformat()
+            output[key] = value.strftime('%c')
         elif isinstance(value, db.GeoPt):
             output[key] = {'lat': value.lat, 'lon': value.lon}
         elif isinstance(value, db.Model):
