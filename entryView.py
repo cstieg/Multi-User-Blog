@@ -1,3 +1,4 @@
+import cgi
 import time
 from google.appengine.ext import db
 
@@ -46,16 +47,15 @@ class Compose(Handler):
         """Render compose new entry template"""
         if not validUserLogin(self):
             self.redirect("/login?caller=newpost")
-        entryMessage = "Type entry here."
-        self.render("compose.html", entry=entryMessage, username=getUsername(self))
+        self.render("compose.html", entry="", username=getUsername(self))
 
     def post(self):
         """Accept new entry"""
         if not validUserLogin(self):
             self.redirect("/login")
-        title = self.request.get("subject")
-        entry = self.request.get("content")
-        username = self.request.cookies.get("username")
+        title = cgi.escape(self.request.get("subject"))
+        entry = cgi.escape(self.request.get("content"))
+        username = cgi.escape(self.request.cookies.get("username"))
 
         if title and entry:
             newEntry = BlogEntry(title=title, entry=entry, author=username)
@@ -124,8 +124,8 @@ class EditPost(Handler):
 
             # only author can delete
             if blogEntry.author == getUsername(self):
-                title = self.request.get("subject")
-                entry = self.request.get("content")
+                title = cgi.escape(self.request.get("subject"))
+                entry = cgi.escape(self.request.get("content"))
 
                 # validate input
                 if title and entry:

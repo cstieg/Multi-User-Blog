@@ -1,5 +1,6 @@
 """Handlers for user signup and login"""
 import re
+import cgi
 
 from google.appengine.ext import db
 
@@ -14,10 +15,10 @@ class Signup(Handler):
 
     def post(self):
         """Handles the signup submission"""
-        username = self.request.get("username")
-        password = self.request.get("password")
-        verify = self.request.get("verify")
-        email = self.request.get("email")
+        username = cgi.escape(self.request.get("username"))
+        password = cgi.escape(self.request.get("password"))
+        verify = cgi.escape(self.request.get("verify"))
+        email = cgi.escape(self.request.get("email"))
 
         # check inputs against regex
         username_re = re.compile("^[a-zA-z0-9_-]{3,20}$")
@@ -62,14 +63,14 @@ class Login(Handler):
     """Allows registered user to login"""
     def get(self):
         """Renders login page"""
-        caller = self.request.get('caller')
+        caller = cgi.escape(self.request.get('caller'))
         self.render("login.html", caller=caller)
 
     def post(self):
         """Accepts login info from login page and sets cookies"""
-        caller = self.request.get('caller')
-        username = self.request.get("username")
-        password = self.request.get("password")
+        caller = cgi.escape(self.request.get('caller'))
+        username = cgi.escape(self.request.get("username"))
+        password = cgi.escape(self.request.get("password"))
 
         # check username and password
         if isValidUser(username, password):

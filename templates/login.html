@@ -1,25 +1,32 @@
+<!DOCTYPE html>
 {% extends "base.html" %}
 
 {% block content %}
     <main>
-      <div class="login_form">
-        <h3>Login</h3>
-
-        <form method="post" action="login">
-          <input type="hidden" name="caller" value="{{caller}}">
-          <label>
-            <p class="form_label">User Name</p>
-            <input class="form_input" type="text" name="username">
-          </label><br>
-          <label>
-            <p class="form_label">Password</p>
-            <input class="form_input" type="password" name="password">
-          </label><br>
-          <input type="submit">
-          <p class="invalid">{% if login_error %}Invalid username or password! Please reenter.{% endif %}</p>
-        </form>
-        <p class="signup">New users may <a href="/signup">sign up here.</a></p>
-      </div>
-
+        <div class="login-form">
+            <h3>Login</h3>
+            <form method="post" action="login">
+                <input type="hidden" name="caller" value="{{caller}}">
+                <label>
+                    <p class="form-label">User Name</p>
+                    <input class="form-input" type="text" name="username">
+                </label>
+                <br>
+                <label>
+                    <p class="form-label">Password</p>
+                    <input class="form-input" type="password" name="password">
+                </label>
+                <br>
+                <input type="submit">
+                <p class="invalid">
+                    {% if login_error %}
+                        Invalid username or password! Please reenter.
+                    {% endif %}
+                </p>
+            </form>
+            <p class="signup">
+                New users may <a href="/signup">sign up here.</a>
+            </p>
+        </div>
     </main>
 {% endblock content %}

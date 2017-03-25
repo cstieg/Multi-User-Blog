@@ -1,5 +1,6 @@
 """Handlers for adding, editing, and deleting comments"""
 import json
+import cgi
 import logging
 from google.appengine.ext import db
 
@@ -24,7 +25,7 @@ class AddComment(Handler):
         else:
             self.error(400)
 
-        commentText = self.request.get('comment')
+        commentText = cgi.escape(self.request.get('comment'))
         userID = getUsername(self)
         if commentText and userID:
             newCommentEntity = addComment(blogEntry, commentText, userID)
@@ -32,6 +33,8 @@ class AddComment(Handler):
             newComment['id'] = newCommentEntity.key().id()
             self.response.out.write(json.dumps(newComment))
         else:
+            logging.info(commentText)
+            logging.info(userID)
             self.error(400)
         
 class EditComment(Handler):
@@ -39,7 +42,7 @@ class EditComment(Handler):
     def post(self, commentID="", parentID=""):
         if not validUserLogin(self):
             self.redirect("/login")
-        commentText = self.request.get('comment')
+        commentText = cgi.escape(self.request.get('comment'))
         if commentID and parentID and commentText:
             # query post by id passed in
             parentKey = BlogEntry.get_by_id(int(parentID)).key()

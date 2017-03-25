@@ -2,29 +2,28 @@
 
 {% block content %}
     <main>
-      <div class="signup_form">
-
+      <div class="signup-form">
         <h3>Signup</h3>
         <form method="post" action="signup">
           <label>
-            <p class="form_label">User Name</p>
-            <input class="form_input {% if username_invalid %}invalid{% endif %}" type="text" name="username" {% if invalid_input %} value="{{old_username}}" {% endif %} >
+            <p class="form-label">User Name</p>
+            <input class="form-input {% if username_invalid %}invalid{% endif %}" type="text" name="username" {% if invalid_input %} value="{{old_username}}" {% endif %} >
             <span class="invalid">{% if username_invalid %} Invalid username! Please reenter {% endif %}
                                   {% if username_already_taken %} Username already taken!  Please chooose another. {% endif %}</span><br>
           </label>
           <label>
-            <p class="form_label">Password</p>
-            <input class="form_input {% if username_invalid %}invalid{% endif %}" type="password" name="password">
+            <p class="form-label">Password</p>
+            <input class="form-input {% if username_invalid %}invalid{% endif %}" type="password" name="password">
             <p class="invalid">{% if password_invalid %} Invalid password! Please reenter {% endif %} </p><br>
           </label>
           <label>
-            <p class="form_label">Verify Password</p>
-            <input class="form_input {% if username_invalid %}invalid{% endif %}" type="password" name="verify">
+            <p class="form-label">Verify Password</p>
+            <input class="form-input {% if username_invalid %}invalid{% endif %}" type="password" name="verify">
             <span class="invalid">{% if verify_invalid %} Password inputs don't match! Please reenter {% endif %} </span><br>
           </label>
           <label>
-            <p class="form_label">Email Address</p>
-            <input class="form_input {% if username_invalid %}invalid{% endif %}" type="email" name="email" {% if invalid_input %} value="{{old_email}}" {% endif %} >
+            <p class="form-label">Email Address</p>
+            <input class="form-input {% if username_invalid %}invalid{% endif %}" type="email" name="email" {% if invalid_input %} value="{{old_email}}" {% endif %} >
             <span class="invalid">{% if email_invalid %} Invalid email! Please reenter {% endif %} </span><br>
           </label>
           <input type="submit">

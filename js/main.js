@@ -72,6 +72,7 @@ function toggleComment(entryID) {
   var $commentsSection = $('#' + entryID + ' .comments-section');
   if ($commentsSection.hasClass('no-display')) {
     $commentsSection.removeClass('no-display');
+    $commentsSection.find('textarea')[0].focus();
     // make textarea submit on enter
     $commentsSection.find('textarea').keypress(function(e) {
       if(e.which == 13) {
@@ -96,6 +97,9 @@ function addComment(entryID, username) {
       var comment = JSON.parse(response);
       var $newCommentSection = commentSectionHTML(comment, entryID, username);
       $('#' + String(entryID) + ' .comments-section')[0].append($newCommentSection[0]);
+      var $commentCount = $('#' + String(entryID) + ' .comment-count')[0];
+      var commentCount = parseInt($commentCount.innerText);
+      $commentCount.innerText = commentCount + 1;
     },
     error: function() {
       alert("Sorry, couldn't post comment at this time!");
@@ -156,22 +160,32 @@ function commentSectionHTML(comment, entryID, username) {
         <div class="comment-footer">
             <div class="comment-likes">
                 <span class="like-comment-button"`;
-    if (comment.author != username) {
-      commentHTML += ` onclick="`;
+    if (comment.author == username) {
+      commentHTML += `<span class="like-comment-label">👍 Likes: </span>`;
+    }
+    else {
+      commentHTML += `<button class="like-comment-button" onclick="`;
       if (comment.liked) {
         commentHTML += `unlikeComment`;
       }
       else {
         commentHTML += `likeComment`;
       }
-      commentHTML += `({{comment.id}}, {{entry.id}})">`;
+      commentHTML += `(${comment.id}}, ${entryID})">👍`;
+      if (comment.liked) {
+        commentHTML += `Unlike`;
+      }
+      else {
+        commentHTML += `Like`;
+      }
+      commentHTML += `</button>`;
     }
-    commentHTML += `👍</span>
-                <span class="like-comment-count">${comment.likeCount}</span>
-            </div>
-            <button class="edit-comment" onclick="editCommentInput(${comment.id}, ${entryID})">Edit</button>
-            <button class="delete-comment" onclick="deleteComment(${comment.id}, ${entryID})">Delete</button>
-            <span class="comment-posted">Written on ${comment.posted} by ${comment.author}</span>
+    commentHTML +=
+        `<span class="like-comment-count">${comment.likeCount}</span>
+          </div>
+          <button class="edit-comment" onclick="editCommentInput(${comment.id}, ${entryID})">Edit</button>
+          <button class="delete-comment" onclick="deleteComment(${comment.id}, ${entryID})">Delete</button>
+          <span class="comment-posted">Written on ${comment.posted} by ${comment.author}</span>
         </div>
         <br>
     </section>`;

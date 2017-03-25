@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 {% extends "base.html" %}
 
 {% block content %}
@@ -40,15 +41,20 @@
                 <button class="edit-post" type="submit">Edit</button>
             </form>
             <div class="delete">
-                <button class="delete-post" onclick="verifyDeletePost({{entry.id}})">Delete</button>
+                <button class="delete-post"
+                    onclick="verifyDeletePost({{entry.id}})">Delete</button>
             </div>
             {% endif %}
-            <span class="entry-posted">Written on {{entry.posted}} by {{entry.author}}</span>
+            <span class="entry-posted">
+                Written on {{entry.posted}} by {{entry.author}}
+            </span>
         </section>
 
         <section class="comments-section no-display">
-            <form class="write-comment" onsubmit="return addComment({{entry.id}}, '{{username}}');">
-                <textarea name="comment" type="text" placeholder="Type a comment, hit enter to submit..."></textarea>
+            <form class="write-comment"
+                    onsubmit="return addComment({{entry.id}}, '{{username}}');">
+                <textarea name="comment" type="text"
+                    placeholder="Type a comment, hit enter to submit..."></textarea>
             </form>
             {% for comment in entry.comments %}
                 <!-- If modifying this code, be sure to make
@@ -81,9 +87,13 @@
                             {% endif %}
                             <span class="like-comment-count">{{comment.likeCount}}</span>
                         </div>
-                        <button class="comment-edit" onclick="editCommentInput({{comment.id}}, {{entry.id}})">Edit</button>
-                        <button class="comment-delete" onclick="deleteComment({{comment.id}}, {{entry.id}})">Delete</button>
-                        <span class="comment-posted">Written on {{comment.posted}} by {{comment.author}}</span>
+                        <button class="comment-edit"
+                            onclick="editCommentInput({{comment.id}}, {{entry.id}})">Edit</button>
+                        <button class="comment-delete"
+                            onclick="deleteComment({{comment.id}}, {{entry.id}})">Delete</button>
+                        <span class="comment-posted">
+                            Written on {{comment.posted}} by {{comment.author}}
+                        </span>
                     </div>
                     <br>
                 </section>

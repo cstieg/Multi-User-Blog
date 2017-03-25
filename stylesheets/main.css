@@ -1,3 +1,4 @@
+/*DOCUMENT**********************************************************/
 html {
   background-color: khaki;
 }
@@ -10,13 +11,14 @@ html {
   display: none;
 }
 
+/*HEADER************************************************************/
 h1 {
   font-family: 'Righteous', cursive;
   font-size: 48pt;
   color: darkgreen;
   text-transform: uppercase;
   text-align: center;
-  padding-bottom: 0pt;
+  padding-bottom: 0;
   margin-bottom: 6pt;
 }
 
@@ -30,14 +32,8 @@ h1 a {
   font-size: 16pt;
   color: forestgreen;
   text-align: center;
-  margin-top: 0pt;
-  padding-top: 0pt;
-}
-
-.mainpage {
-  position: absolute;
-  left: 10px;
-  top: 10px;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .login {
@@ -46,10 +42,8 @@ h1 a {
   top: 10px;
 }
 
-.entry {
-  display: block;
-}
 
+/*BLOG ENTRY********************************************************/
 h2 {
   margin-bottom: 0;
 }
@@ -60,8 +54,9 @@ h2 {
   border: thin solid yellow;
 }
 
-.entry-footer,
-.comment-footer {
+
+/*FOOTER BARS*******************************************************/
+.entry-footer {
   background-color: tan;
   border: solid black thin;
   display: flex;
@@ -70,9 +65,14 @@ h2 {
 
 .comment-footer {
   background-color: palegoldenrod;
+  border: solid black thin;
+  display: flex;
+  flex-direction: row;
   font-size: 11pt;
 }
 
+
+/*FOOTER BAR ELEMENTS***********************************************/
 .likes,
 .comments,
 .edit,
@@ -84,20 +84,25 @@ h2 {
   vertical-align: middle;
 }
 
-.like-button,
-.like-label,
-.like-count,
-.comment-button,
-.comment-count {
-  margin: 0, 10px;
-  vertical-align: bottom;
-}
-
 .likes,
 .comments,
 .comment-likes {
   display: flex;
   flex-direction: row;
+}
+
+.entry-posted, .comment-posted {
+  margin: auto 5px auto auto;
+}
+
+/*FOOTER BAR ELEMENT SUB-COMPONENTS*********************************/
+.like-button,
+.like-label,
+.like-count,
+.comment-button,
+.comment-count {
+  margin: 0 2px;
+  vertical-align: bottom;
 }
 
 .like-button,
@@ -109,6 +114,7 @@ h2 {
   margin: auto 10px;
 }
 
+/*COMMENTS**********************************************************/
 .comments-section {
   margin: 10px 0 10px 20%;
   padding: 5px;
@@ -121,13 +127,10 @@ h2 {
   vertical-align: top;
 }
 
-.entry-posted, .comment-posted {
-  margin: auto 5px auto auto;
-}
-
+/*FORMS (SIGNUP, LOGIN)*********************************************/
 .form-label {
   width: 100%;
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .form-input {
@@ -139,9 +142,8 @@ h2 {
 .signup-form {
   width: 60%;
   max-width: 300px;
-  margin-right: auto;
-  margin-left: auto;
-  border: 1px solid black;
+  margin: auto;
+  border: thin solid black;
   padding: 20px;
   background-color: greenyellow;
 }

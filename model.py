@@ -1,4 +1,4 @@
-import logging
+import cgi
 import hashlib
 from google.appengine.ext import db
 
@@ -117,8 +117,8 @@ def editComment(commentEntity, newCommentText):
     return commentEntity
 
 def validUserLogin(handler):
-    username = handler.request.cookies.get("username")
-    password = handler.request.cookies.get("password")
+    username = cgi.escape(handler.request.cookies.get("username"))
+    password = cgi.escape(handler.request.cookies.get("password"))
     return isValidUser(username, password)
 
 def isValidUser(username, password):
@@ -126,7 +126,7 @@ def isValidUser(username, password):
 
 def getUsername(handler):
     if validUserLogin(handler):
-        return handler.request.cookies.get("username")
+        return cgi.escape(handler.request.cookies.get("username"))
     return ""
 
 def logout(handler):

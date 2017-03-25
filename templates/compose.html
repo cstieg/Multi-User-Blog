@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 {% extends "base.html" %}
 
 {% block content %}
@@ -6,12 +7,13 @@
     <main>
         <form method="post" action="newpost">{% endblock formAction %}
         <label>
-          <p class="form_label">Title</p>
-          <input class="form_input" name="subject" type="text" value="{{title}}">
+          <p class="form-label">Title</p>
+          <input class="form-input" name="subject" type="text" value="{{title}}">
         </label><br>
         <label>
-          <p class="form_label">Blog Entry</p>
-          <textarea class="form_input" name="content" cols="50" rows="25">{{entry}}</textarea>
+          <p class="form-label">Blog Entry</p>
+          <textarea class="form-input" name="content" cols="50" rows="25"
+            placeholder="Type entry here...">{{entry}}</textarea>
         </label>
         <br>
         <input type="submit">
