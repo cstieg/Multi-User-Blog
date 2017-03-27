@@ -25,4 +25,3 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/likecomment/([0-9]+)/([0-9]+)', LikeComment),
                                ('/unlikecomment/([0-9]+)/([0-9]+)', UnlikeComment)
                                ], debug=True)
-

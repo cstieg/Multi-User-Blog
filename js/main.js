@@ -1,8 +1,11 @@
+// confirmation dialog box on deletion
 function verifyDeletePost(entryID) {
   $('#delete-post-dialog').dialog();
   $('#delete-post-dialog [name=delete]').attr('onclick', 'deletePost(' + String(entryID) + ')');
 }
 
+// make ajax call to server to delete entry, and on success, remove entry
+// without refreshing page
 function deletePost(entryID) {
   $.post({
     url : '/deletepost/' + String(entryID),
@@ -14,11 +17,8 @@ function deletePost(entryID) {
   });
 }
 
-function closeDialog(dialogButton) {
-  var dialogDiv = $(dialogButton).closest('div');
-  dialogDiv.dialog('close');
-}
-
+// make ajax call to server to like entry, and on success, toggle like button
+// to unlike and increment like count without refreshing page
 function likePost(entryID) {
   $.post({
     url : '/likepost/' + String(entryID),
@@ -43,6 +43,8 @@ function likePost(entryID) {
   });
 }
 
+// make ajax call to server to unlike entry, and on success, toggle unlike
+// button to like and decrement like count wihout refreshing page
 function unlikePost(entryID) {
   $.post({
     url: '/unlikepost/' + String(entryID),
@@ -68,6 +70,7 @@ function unlikePost(entryID) {
   });
 }
 
+// toggle comment section with button
 function toggleComment(entryID) {
   var $commentsSection = $('#' + entryID + ' .comments-section');
   if ($commentsSection.hasClass('no-display')) {
@@ -86,6 +89,7 @@ function toggleComment(entryID) {
   }
 }
 
+// make ajax call to server to add comment and immediately add to html without refreshing
 function addComment(entryID, username) {
   var $newCommentTextarea = $('#' + String(entryID) + ' textarea')[0];
   var commentText = $newCommentTextarea.value;
@@ -111,6 +115,8 @@ function addComment(entryID, username) {
   return false;
 }
 
+// make ajax call to server to delete comment and immediately remove from html
+// without refreshing
 function deleteComment(commentID, entryID) {
   $.post({
     url: '/deletecomment/' + String(commentID) + '/' + String(entryID),
@@ -123,6 +129,7 @@ function deleteComment(commentID, entryID) {
   });
 }
 
+// open dialog box to edit comment
 function editCommentInput(commentID, entryID) {
   var $commentText = $('#' + commentID + ' .comment-text')[0];
   var commentText = $commentText.innerText;
@@ -134,6 +141,7 @@ function editCommentInput(commentID, entryID) {
   $('#edit-comment-dialog').dialog();
 }
 
+// make ajax call to server to update comment and immediately update HTML
 function editComment(commentID, entryID) {
   var commentTextField = $('#edit-comment-dialog [name=comment]');
   var commentText = commentTextField[0].value;
@@ -151,6 +159,7 @@ function editComment(commentID, entryID) {
   return false;
 }
 
+// template to create a new comment section after addComment without refreshing
 function commentSectionHTML(comment, entryID, username) {
   var commentHTML =
   `<section class="comment" id="${comment.id}">
@@ -160,7 +169,7 @@ function commentSectionHTML(comment, entryID, username) {
         <div class="comment-footer">
             <div class="comment-likes">
                 <span class="like-comment-button"`;
-    if (comment.author == username) {
+    if (!username || comment.author == username) {
       commentHTML += `<span class="like-comment-label">👍 Likes: </span>`;
     }
     else {
@@ -180,12 +189,14 @@ function commentSectionHTML(comment, entryID, username) {
       }
       commentHTML += `</button>`;
     }
-    commentHTML +=
-        `<span class="like-comment-count">${comment.likeCount}</span>
-          </div>
-          <button class="edit-comment" onclick="editCommentInput(${comment.id}, ${entryID})">Edit</button>
-          <button class="delete-comment" onclick="deleteComment(${comment.id}, ${entryID})">Delete</button>
-          <span class="comment-posted">Written on ${comment.posted} by ${comment.author}</span>
+    commentHTML += `<span class="like-comment-count">${comment.likeCount}</span>
+          </div>`;
+    if (username && username == comment.author) {
+      commentHTML +=
+      `<button class="edit-comment" onclick="editCommentInput(${comment.id}, ${entryID})">Edit</button>
+      <button class="delete-comment" onclick="deleteComment(${comment.id}, ${entryID})">Delete</button>`;
+    }
+    commentHTML += `<span class="comment-posted">Written on ${comment.posted} by ${comment.author}</span>
         </div>
         <br>
     </section>`;
@@ -193,6 +204,7 @@ function commentSectionHTML(comment, entryID, username) {
     return $.parseHTML(commentHTML);
 }
 
+// make ajax call to server to like comment and increment comment like count
 function likeComment(commentID, entryID) {
   $.post({
     url : '/likecomment/' + String(commentID) + '/' + String(entryID),
@@ -212,11 +224,12 @@ function likeComment(commentID, entryID) {
       $likeCount.text(likeCount + 1);
     },
     error: function() {
-      alert("Not allowed to like!");
+      alert('Not allowed to like!');
     }
   });
 }
 
+// make ajax call to server to unlike comment and decrement comment like count
 function unlikeComment(commentID, entryID) {
   $.post({
     url: '/unlikecomment/' + String(commentID) + '/' + String(entryID),
@@ -240,4 +253,10 @@ function unlikeComment(commentID, entryID) {
       alert("Not allowed to unlike!");
     }
   });
+}
+
+// close dialog box opened by edit comment dialog or delete post dialog
+function closeDialog(dialogButton) {
+  var dialogDiv = $(dialogButton).closest('div');
+  dialogDiv.dialog('close');
 }

@@ -1,5 +1,6 @@
-import cgi
+
 import time
+from utils import sanitize
 from google.appengine.ext import db
 
 from handler import Handler
@@ -15,34 +16,34 @@ class MainPage(Handler):
             if not entryKey:
                 self.error(404)
                 return
-            blogEntries = [db.get(entryKey)]
+            entryEntities = [db.get(entryKey)]
         else:
-            blogEntries = db.GqlQuery("SELECT* FROM BlogEntry ORDER BY posted DESC")
+            entryEntities = db.GqlQuery("SELECT* FROM BlogEntry ORDER BY posted DESC")
 
         # recreate query in list of dicts in order to be able to pass in 'liked' variable
         userName = getUsername(self)
         entryList = []
-        for blogEntry in blogEntries:
-            entryDict = to_dict(blogEntry)
-            entryDict['id'] = blogEntry.key().id()       
-            entryDict['liked'] = postIsLiked(blogEntry, userName)
-                
+        for entryEntity in entryEntities:
+            entryDict = to_dict(entryEntity)
+            entryDict['id'] = entryEntity.key().id()
+            entryDict['liked'] = postIsLiked(entryEntity, userName)
+
             # add in comments
             commentList = []
-            for comment in Comment.all().ancestor(blogEntry).order('posted'):
+            for comment in Comment.all().ancestor(entryEntity).order('posted'):
                 commentDict = to_dict(comment)
                 commentDict['id'] = comment.key().id()
                 commentDict['liked'] = commentIsLiked(comment, userName)
                 commentList.append(commentDict)
-                
+
             entryDict['comments'] = commentList
-            
+
             entryList.append(entryDict)
 
         self.render("mainpage.html", blogEntries=entryList, username=getUsername(self))
-        
+
 class Compose(Handler):
-    """handler for new entry"""
+    """Handler for new entry"""
     def get(self):
         """Render compose new entry template"""
         if not validUserLogin(self):
@@ -53,14 +54,14 @@ class Compose(Handler):
         """Accept new entry"""
         if not validUserLogin(self):
             self.redirect("/login")
-        title = cgi.escape(self.request.get("subject"))
-        entry = cgi.escape(self.request.get("content"))
-        username = cgi.escape(self.request.cookies.get("username"))
+        title = sanitize(self.request.get("subject"))
+        entry = sanitize(self.request.get("content"))
+        username = sanitize(self.request.cookies.get("username"))
 
         if title and entry:
-            newEntry = BlogEntry(title=title, entry=entry, author=username)
-            newEntry.put()
-            self.redirect("/" + str(newEntry.key().id()))
+            newEntryEntity = BlogEntry(title=title, entry=entry, author=username)
+            newEntryEntity.put()
+            self.redirect("/" + str(newEntryEntity.key().id()))
         else:
             if not title:
                 error = "Must input title!"
@@ -69,7 +70,7 @@ class Compose(Handler):
             if not title and not entry:
                 error = "Must input title and blog entry content!"
             self.render("compose.html", entry=entry, title=title, error=error, username=username)
-            
+
 class DeletePost(Handler):
     """Deletes a post passed in from /deletepost/[postID]"""
     def post(self, q=""):
@@ -82,17 +83,17 @@ class DeletePost(Handler):
             if not entryKey:
                 self.error(404)
                 return
-            blogEntry = db.get(entryKey)
+            entryEntity = db.get(entryKey)
             # only author can delete
-            if blogEntry.author == getUsername(self):
-                blogEntry.delete()
+            if entryEntity.author == getUsername(self):
+                entryEntity.delete()
                 self.redirect("/")
             else:
                 self.error(401)
         else:
             # if post id not found, it is a bad request
             self.error(400)
-            
+
 class EditPost(Handler):
     """Replaces the blog text with the text passed in from /editpost/[postid]"""
     def get(self, q=""):
@@ -100,11 +101,11 @@ class EditPost(Handler):
         if not validUserLogin(self):
             self.redirect("/login")
         if q:
-            # query post by id passed in
+            # query entryEntity by id passed in
             entryKey = db.Key.from_path('BlogEntry', int(q))
-            post = db.get(entryKey)
-            
-            self.render("edit.html", postID=q, entry=post.entry, title=post.title, username=getUsername(self))
+            entryEntity = db.get(entryKey)
+
+            self.render("edit.html", postID=q, entry=entryEntity.entry, title=entryEntity.title, username=getUsername(self))
         else:
             self.error(400)
 
@@ -120,22 +121,22 @@ class EditPost(Handler):
             if not entryKey:
                 self.error(400)
                 return
-            blogEntry = db.get(entryKey)
+            entryEntity = db.get(entryKey)
 
             # only author can delete
-            if blogEntry.author == getUsername(self):
-                title = cgi.escape(self.request.get("subject"))
-                entry = cgi.escape(self.request.get("content"))
+            if entryEntity.author == getUsername(self):
+                title = sanitize(self.request.get("subject"))
+                entry = sanitize(self.request.get("content"))
 
                 # validate input
                 if title and entry:
-                    blogEntry.title = title
-                    blogEntry.entry = entry
-                    db.put(blogEntry)
+                    entryEntity.title = title
+                    entryEntity.entry = entry
+                    db.put(entryEntity)
 
                     # workaround to wait for eventual consistency in datastore
                     # so as not to redirect back to home page before updating
-                    while blogEntry.title != title or blogEntry.entry != entry:
+                    while entryEntity.title != title or entryEntity.entry != entry:
                         time.sleep(0.01)
 
                     self.redirect("/")

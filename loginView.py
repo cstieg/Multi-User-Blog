@@ -1,7 +1,7 @@
 """Handlers for user signup and login"""
 import re
-import cgi
 
+from utils import sanitize
 from google.appengine.ext import db
 
 from handler import Handler
@@ -15,10 +15,10 @@ class Signup(Handler):
 
     def post(self):
         """Handles the signup submission"""
-        username = cgi.escape(self.request.get("username"))
-        password = cgi.escape(self.request.get("password"))
-        verify = cgi.escape(self.request.get("verify"))
-        email = cgi.escape(self.request.get("email"))
+        username = sanitize(self.request.get("username"))
+        password = sanitize(self.request.get("password"))
+        verify = sanitize(self.request.get("verify"))
+        email = sanitize(self.request.get("email"))
 
         # check inputs against regex
         username_re = re.compile("^[a-zA-z0-9_-]{3,20}$")
@@ -45,16 +45,16 @@ class Signup(Handler):
                                     old_email=email)
         else:
             # Check to make sure no one has already registered with that username
-            usersWithSameName = db.GqlQuery("SELECT * FROM User WHERE username = '%s'" % username)
-            if usersWithSameName.count() > 0:
+            usersWithSameNameQuery = db.GqlQuery("SELECT * FROM User WHERE username = '%s'" % username)
+            if usersWithSameNameQuery.count() > 0:
 
                 self.render("signup.html", username_already_taken=True,
                                             old_username=username,
                                             old_email=email)
             else:
                 # Add User entity to datastore
-                newUser = User(username=username, password=password)
-                newUser.put()
+                newUserEntity = User(username=username, password=password)
+                newUserEntity.put()
                 self.response.set_cookie('username', username, max_age=60 * 60 * 24)
                 self.redirect('/newpost')
                 self.render("success.html", username=username)
@@ -63,14 +63,14 @@ class Login(Handler):
     """Allows registered user to login"""
     def get(self):
         """Renders login page"""
-        caller = cgi.escape(self.request.get('caller'))
+        caller = sanitize(self.request.get('caller'))
         self.render("login.html", caller=caller)
 
     def post(self):
         """Accepts login info from login page and sets cookies"""
-        caller = cgi.escape(self.request.get('caller'))
-        username = cgi.escape(self.request.get("username"))
-        password = cgi.escape(self.request.get("password"))
+        caller = sanitize(self.request.get('caller'))
+        username = sanitize(self.request.get("username"))
+        password = sanitize(self.request.get("password"))
 
         # check username and password
         if isValidUser(username, password):

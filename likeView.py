@@ -1,10 +1,9 @@
 """Handlers for likes on blog entries and comments"""
-import logging
 from google.appengine.ext import db
 
 from handler import Handler
-from model import (BlogEntry, Comment, validUserLogin, getUsername, 
-                   postIsLiked, likePost, unlikePost, commentIsLiked, 
+from model import (BlogEntry, Comment, validUserLogin, getUsername,
+                   postIsLiked, likePost, unlikePost, commentIsLiked,
                    likeComment, unlikeComment)
 
 class LikePost(Handler):
@@ -20,20 +19,20 @@ class LikePost(Handler):
             if not entryKey:
                 self.error(400)
                 return
-            blogEntry = db.get(entryKey)
+            entryEntity = db.get(entryKey)
 
             # author cannot like
             liker = getUsername(self)
-            if liker == blogEntry.author:
+            if liker == entryEntity.author:
                 self.error(403)
                 return
-            
-            if postIsLiked(blogEntry, liker):
+
+            if postIsLiked(entryEntity, liker):
                 # forbidden to like twice
                 self.error(403)
                 return
 
-            likePost(blogEntry, liker)
+            likePost(entryEntity, liker)
 
         else:
             self.error(400)
@@ -52,20 +51,20 @@ class UnlikePost(Handler):
             if not entryKey:
                 self.error(400)
                 return
-            blogEntry = db.get(entryKey)
+            entryEntity = db.get(entryKey)
 
             liker = getUsername(self)
-            if not postIsLiked(blogEntry, liker):
+            if not postIsLiked(entryEntity, liker):
                 # cannot unlike if not liked
                 self.error(403)
                 return
 
-            unlikePost(blogEntry, liker)
+            unlikePost(entryEntity, liker)
 
         else:
             self.error(400)
-            
-            
+
+
 class LikeComment(Handler):
     """Adds a user like and increments like count for comment"""
     def post(self, commentID="", parentID=""):
@@ -86,7 +85,7 @@ class LikeComment(Handler):
             if liker == commentEntity.author:
                 self.error(403)
                 return
-            
+
             if commentIsLiked(commentEntity, liker):
                 # forbidden to like twice
                 self.error(403)

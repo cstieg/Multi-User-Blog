@@ -10,7 +10,7 @@
 
         <section class="entry-footer">
             <div class="likes">
-                {% if entry.author != username %}
+                {% if username and entry.author != username %}
                 <button class="like-button" onclick="
                     {% if entry.liked %}
                         unlikePost
@@ -36,7 +36,7 @@
                 </button>
                 <span class="comment-count">{{entry.commentCount}}</span>
             </div>
-            {% if entry.author == username %}
+            {% if username and entry.author == username %}
             <form class="edit" action="editpost/{{entry.id}}" method="get">
                 <button class="edit-post" type="submit">Edit</button>
             </form>
@@ -51,11 +51,16 @@
         </section>
 
         <section class="comments-section no-display">
+            {% if username %}
             <form class="write-comment"
                     onsubmit="return addComment({{entry.id}}, '{{username}}');">
                 <textarea name="comment" type="text"
                     placeholder="Type a comment, hit enter to submit..."></textarea>
             </form>
+            {% else %}
+                <h4>Login to comment.</h4>
+            {% endif %}
+            <hr>
             {% for comment in entry.comments %}
                 <!-- If modifying this code, be sure to make
                      corresponding modifications to the addComment
@@ -67,7 +72,7 @@
 
                     <div class="comment-footer">
                         <div class="comment-likes">
-                            {% if comment.author == username %}
+                            {% if not username or comment.author == username %}
                                 <span class="like-comment-label">👍 Likes: </span>
                             {% else %}
                                 <button class="like-comment-button" onclick="
@@ -87,10 +92,12 @@
                             {% endif %}
                             <span class="like-comment-count">{{comment.likeCount}}</span>
                         </div>
-                        <button class="comment-edit"
-                            onclick="editCommentInput({{comment.id}}, {{entry.id}})">Edit</button>
-                        <button class="comment-delete"
-                            onclick="deleteComment({{comment.id}}, {{entry.id}})">Delete</button>
+                        {% if username and username == comment.author %}
+                            <button class="comment-edit"
+                                onclick="editCommentInput({{comment.id}}, {{entry.id}})">Edit</button>
+                            <button class="comment-delete"
+                                onclick="deleteComment({{comment.id}}, {{entry.id}})">Delete</button>
+                        {% endif %}
                         <span class="comment-posted">
                             Written on {{comment.posted}} by {{comment.author}}
                         </span>

@@ -1,11 +1,10 @@
 """Handlers for adding, editing, and deleting comments"""
 import json
-import cgi
-import logging
+from utils import sanitize
 from google.appengine.ext import db
 
 from handler import Handler
-from model import (BlogEntry, Comment, validUserLogin, getUsername, addComment, 
+from model import (BlogEntry, Comment, validUserLogin, getUsername, addComment,
                    editComment, deleteComment)
 from utils import to_dict
 
@@ -21,28 +20,26 @@ class AddComment(Handler):
             if not entryKey:
                 self.error(400)
                 return
-            blogEntry = db.get(entryKey)
+            entryEntity = db.get(entryKey)
         else:
             self.error(400)
 
-        commentText = cgi.escape(self.request.get('comment'))
+        commentText = sanitize(self.request.get('comment'))
         userID = getUsername(self)
         if commentText and userID:
-            newCommentEntity = addComment(blogEntry, commentText, userID)
-            newComment = to_dict(newCommentEntity)
-            newComment['id'] = newCommentEntity.key().id()
-            self.response.out.write(json.dumps(newComment))
+            newCommentEntity = addComment(entryEntity, commentText, userID)
+            newCommentDict = to_dict(newCommentEntity)
+            newCommentDict['id'] = newCommentEntity.key().id()
+            self.response.out.write(json.dumps(newCommentDict))
         else:
-            logging.info(commentText)
-            logging.info(userID)
             self.error(400)
-        
+
 class EditComment(Handler):
     """Edit a comment made by the author on a particular post"""
     def post(self, commentID="", parentID=""):
         if not validUserLogin(self):
             self.redirect("/login")
-        commentText = cgi.escape(self.request.get('comment'))
+        commentText = sanitize(self.request.get('comment'))
         if commentID and parentID and commentText:
             # query post by id passed in
             parentKey = BlogEntry.get_by_id(int(parentID)).key()
@@ -55,13 +52,13 @@ class EditComment(Handler):
             # only author can edit
             userID = getUsername(self)
             if commentEntity.author == userID:
-                 editComment(commentEntity, commentText)
+                editComment(commentEntity, commentText)
             else:
                 self.error(401)
         else:
-            self.error(400)            
-            
-            
+            self.error(400)
+
+
 class DeleteComment(Handler):
     """Delete a comment made by the author on a particular post"""
     def post(self, commentID="", parentID=""):
@@ -83,5 +80,4 @@ class DeleteComment(Handler):
             else:
                 self.error(401)
         else:
-            self.error(400)            
-            
+            self.error(400)

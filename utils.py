@@ -1,9 +1,4 @@
-"""
-originally written by 'dmw'
-(http://stackoverflow.com/questions/1531501/json-serialization-of-google-app-engine-models)
-slight modifications made
-"""
-
+import cgi
 import datetime
 from google.appengine.ext import db
 
@@ -12,7 +7,10 @@ from google.appengine.ext import db
 SIMPLE_TYPES = (int, long, float, bool, dict, basestring, list)
 
 def to_dict(model):
-    """Converts a datastore entity into a Python dict"""
+    """Converts a datastore entity into a Python dict
+    originally written by 'dmw'
+    (http://stackoverflow.com/questions/1531501/json-serialization-of-google-app-engine-models)
+    slight modifications made"""
     output = {}
 
     for key, prop in model.properties().iteritems():
@@ -22,9 +20,9 @@ def to_dict(model):
             output[key] = value
         elif isinstance(value, datetime.date):
             # Convert date/datetime to MILLISECONDS-since-epoch (JS "new Date()").
-            #ms = time.mktime(value.utctimetuple()) * 1000
-            #ms += getattr(value, 'microseconds', 0) / 1000
-            #output[key] = int(ms)
+            # ms = time.mktime(value.utctimetuple()) * 1000
+            # ms += getattr(value, 'microseconds', 0) / 1000
+            # output[key] = int(ms)
             output[key] = value.strftime('%c')
         elif isinstance(value, db.GeoPt):
             output[key] = {'lat': value.lat, 'lon': value.lon}
@@ -34,3 +32,10 @@ def to_dict(model):
             raise ValueError('cannot encode ' + repr(prop))
 
     return output
+
+def sanitize(textToSanitize):
+    """Returns string sanitized of html and script"""
+    if textToSanitize:
+        return cgi.escape(textToSanitize)
+    else:
+        return textToSanitize
