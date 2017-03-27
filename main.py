@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Blog app that allows a user to signup, login, post blog entries,
 manage one's own entries, view and comment on the entries, and like other
 author's entries and comments"""
@@ -8,6 +9,7 @@ from entryView import MainPage, Compose, DeletePost, EditPost
 from commentView import AddComment, DeleteComment, EditComment
 from loginView import Signup, Login, Logout
 from likeView import LikePost, UnlikePost, LikeComment, UnlikeComment
+
 
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/([0-9]+)', MainPage),

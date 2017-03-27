@@ -1,4 +1,4 @@
-
+import logging
 import time
 from utils import sanitize
 from google.appengine.ext import db
@@ -42,6 +42,7 @@ class MainPage(Handler):
 
         self.render("mainpage.html", blogEntries=entryList, username=getUsername(self))
 
+
 class Compose(Handler):
     """Handler for new entry"""
     def get(self):
@@ -71,6 +72,7 @@ class Compose(Handler):
                 error = "Must input title and blog entry content!"
             self.render("compose.html", entry=entry, title=title, error=error, username=username)
 
+
 class DeletePost(Handler):
     """Deletes a post passed in from /deletepost/[postID]"""
     def post(self, q=""):
@@ -93,6 +95,7 @@ class DeletePost(Handler):
         else:
             # if post id not found, it is a bad request
             self.error(400)
+
 
 class EditPost(Handler):
     """Replaces the blog text with the text passed in from /editpost/[postid]"""

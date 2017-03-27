@@ -34,6 +34,7 @@ class AddComment(Handler):
         else:
             self.error(400)
 
+
 class EditComment(Handler):
     """Edit a comment made by the author on a particular post"""
     def post(self, commentID="", parentID=""):

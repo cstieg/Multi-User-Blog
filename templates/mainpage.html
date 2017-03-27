@@ -6,7 +6,11 @@
     {% for entry in blogEntries %}
     <article class="entry" id="{{entry.id}}">
         <h2 class="entry-title"><a href="/{{entry.id}}">{{entry.title}}</a></h2>
-        <p class="entry-content">{{entry.entry}}</p>
+        <p class="entry-content">
+          {% for line in entry.entry.splitlines() %}
+            {{line}}<br>
+          {% endfor %}
+        </p>
 
         <section class="entry-footer">
             <div class="likes">
@@ -67,7 +71,9 @@
                      function in main.js -->
                 <section class="comment" id="{{comment.id}}">
                     <p class="comment-text">
-                        {{comment.comment}}
+                        {% for line in comment.comment.splitlines() %}
+                          {{line}}<br>
+                        {% endfor %}
                     </p>
 
                     <div class="comment-footer">
