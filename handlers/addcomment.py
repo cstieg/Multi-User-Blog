@@ -5,7 +5,7 @@ import models, handlers
 class AddComment(handlers.Handler):
     """Add a comment to a particular post"""
     @handlers.check_logged_in
-    def post(self, entry_id=""):
+    def post(self, entry_id=''):
         if entry_id:
             # query post by id passed in
             entry_key = db.Key.from_path('BlogEntry', int(entry_id))

@@ -10,9 +10,9 @@ class Compose(handlers.Handler):
     @handlers.check_logged_in
     def post(self):
         """Accept new entry"""
-        title = handlers.sanitize(self.request.get("subject"))
-        entry = handlers.sanitize(self.request.get("content"))
-        username = handlers.sanitize(self.request.cookies.get("username"))
+        title = handlers.sanitize(self.request.get('subject'))
+        entry = handlers.sanitize(self.request.get('content'))
+        username = handlers.sanitize(self.request.cookies.get('username'))
 
         if title and entry:
             new_entry_entity = models.BlogEntry(title=title, entry=entry, author=username)
@@ -20,9 +20,9 @@ class Compose(handlers.Handler):
             self.redirect("/" + str(new_entry_entity.key().id()))
         else:
             if not title:
-                error = "Must input title!"
+                error = 'Must input title!'
             if not entry:
-                error = "Must input blog entry content!"
+                error = 'Must input blog entry content!'
             if not title and not entry:
-                error = "Must input title and blog entry content!"
-            self.render("compose.html", entry=entry, title=title, error=error, username=username)
+                error = 'Must input title and blog entry content!'
+            self.render('compose.html', entry=entry, title=title, error=error, username=username)

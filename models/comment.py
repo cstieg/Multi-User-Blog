@@ -24,16 +24,6 @@ def add_comment(entry_entity, comment_text, commenter):
 
     return new_comment_entity
 
-
-@db.transactional(xg=True)
-def delete_comment(comment_entity, parent_entity):
-    """Deletes a comment on a blog entry and decrements the comment count on the entry"""
-    parent_entity.commentCount -= 1
-    parent_entity.put()
-
-    comment_entity.delete()
-
-
 def edit_comment(comment_entity, new_comment_text):
     """Edits a comment on a blog entry"""
     comment_entity.comment = new_comment_text

@@ -5,51 +5,34 @@ import handlers
 class EditPost(handlers.Handler):
     """Replaces the blog text with the text passed in from /editpost/[postid]"""
     @handlers.check_logged_in
-    def get(self, entry_id=''):
+    @handlers.check_entry_exists
+    def get(self, entry_id, entry_entity):
         """Render template for editing entry"""
-        if entry_id:
-            # query entryEntity by id passed in
-            entryKey = db.Key.from_path('BlogEntry', int(entry_id))
-            entryEntity = db.get(entryKey)
-
-            self.render('edit.html', postID=entry_id, entry=entryEntity.entry, title=entryEntity.title, username=handlers.get_username(self))
-        else:
-            self.error(400)
+        self.render('edit.html', postID=entry_id, entry=entry_entity.entry, title=entry_entity.title, username=handlers.get_username(self))
 
     @handlers.check_logged_in
-    def post(self, entry_id=''):
+    @handlers.check_entry_exists
+    def post(self, entry_id, entry_entity):
         """Accept edited entry"""
-        if entry_id:
-            # query post by id passed in
-            entry_key = db.Key.from_path('BlogEntry', int(entry_id))
+        # only author can delete
+        if entry_entity.author == handlers.get_username(self):
+            title = handlers.sanitize(self.request.get('subject'))
+            entry = handlers.sanitize(self.request.get('content'))
 
-            if not entry_key:
-                self.error(400)
-                return
-            entry_entity = db.get(entry_key)
+            # validate input
+            if title and entry:
+                entry_entity.title = title
+                entry_entity.entry = entry
+                db.put(entry_entity)
 
-            # only author can delete
-            if entry_entity.author == handlers.get_username(self):
-                title = handlers.sanitize(self.request.get('subject'))
-                entry = handlers.sanitize(self.request.get('content'))
+                # workaround to wait for eventual consistency in datastore
+                # so as not to redirect back to home page before updating
+                while entry_entity.title != title or entry_entity.entry != entry:
+                    time.sleep(0.01)
 
-                # validate input
-                if title and entry:
-                    entry_entity.title = title
-                    entry_entity.entry = entry
-                    db.put(entry_entity)
-
-                    # workaround to wait for eventual consistency in datastore
-                    # so as not to redirect back to home page before updating
-                    while entry_entity.title != title or entry_entity.entry != entry:
-                        time.sleep(0.01)
-
-                    self.redirect("/")
-                else:
-                    self.error(400)
+                self.redirect("/")
             else:
-                # unauthorized
-                self.error(401)
+                self.error(400)
         else:
-            # if post id not found, it is a bad request
-            self.error(400)
+            # unauthorized
+            self.error(401)

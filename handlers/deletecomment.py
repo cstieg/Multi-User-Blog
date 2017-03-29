@@ -4,22 +4,11 @@ import models, handlers
 class DeleteComment(handlers.Handler):
     """Delete a comment made by the author on a particular post"""
     @handlers.check_logged_in
-    def post(self, comment_id="", parent_id=""):
-        if comment_id and parent_id:
-            # query post by id passed in
-            parent_key = models.BlogEntry.get_by_id(int(parent_id)).key()
-            parent_entity = db.get(parent_key)
-            # comment_entity = Comment.get_by_id(int(comment_id), parent=parent_key)
-            comment_entity = models.Comment.get_by_id(int(comment_id))
-            if not comment_entity or not parent_entity:
-                self.error(400)
-                return
-
-            # only author can delete
-            user_id = handlers.get_username(self)
-            if comment_entity.author == user_id:
-                models.delete_comment(comment_entity, parent_entity)
-            else:
-                self.error(401)
+    @handlers.check_comment_exists
+    def post(self, comment_entity):
+        # only author can delete
+        user_id = handlers.get_username(self)
+        if comment_entity.author == user_id:
+            comment_entity.delete()
         else:
-            self.error(400)
+            self.error(401)

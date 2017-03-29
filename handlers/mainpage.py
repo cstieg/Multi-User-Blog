@@ -4,13 +4,10 @@ import models, handlers
 
 class MainPage(handlers.Handler):
     """Displays the main blog page from template mainpage.html"""
-    def get(self, entry_id=""):
+    @handlers.check_entry_exists(False)
+    def get(self, entry_id='', entry_entity=None):
         if entry_id:
-            entry_key = db.Key.from_path('BlogEntry', int(entry_id))
-            if not entry_key:
-                self.error(404)
-                return
-            entry_entities = [db.get(entry_key)]
+            entry_entities = [entry_entity]
         else:
             entry_entities = db.GqlQuery("SELECT* FROM BlogEntry ORDER BY posted DESC")
 

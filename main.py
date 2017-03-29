@@ -19,8 +19,8 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/likepost/([0-9]+)', LikePost),
                                ('/unlikepost/([0-9]+)', UnlikePost),
                                ('/addcomment/([0-9]+)', AddComment),
-                               ('/deletecomment/([0-9]+)/([0-9]+)', DeleteComment),
-                               ('/editcomment/([0-9]+)/([0-9]+)', EditComment),
-                               ('/likecomment/([0-9]+)/([0-9]+)', LikeComment),
-                               ('/unlikecomment/([0-9]+)/([0-9]+)', UnlikeComment)
+                               ('/deletecomment/([0-9]+)', DeleteComment),
+                               ('/editcomment/([0-9]+)', EditComment),
+                               ('/likecomment/([0-9]+)', LikeComment),
+                               ('/unlikecomment/([0-9]+)', UnlikeComment)
                                ], debug=True)

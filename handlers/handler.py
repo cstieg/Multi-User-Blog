@@ -64,11 +64,41 @@ def sanitize(text_to_sanitize):
         return text_to_sanitize
 
 
-def check_logged_in(url_args):
+def check_logged_in(url_args=''):
     def decorator(func):
         def wrapper(self, entry_id=''):
             if not handlers.valid_user_login(self):
                 return self.redirect('/login' + url_args)
             return func(self, entry_id)
+        return wrapper
+    return decorator
+
+def check_entry_exists(entry_id_required=True):
+    def decorator(func):
+        def wrapper(self, entry_id=''):
+            entry_entity = None
+            if entry_id:
+                entry_key = db.Key.from_path('BlogEntry', int(entry_id))
+                entry_entity = db.get(entry_key)
+                if not entry_entity:
+                    return self.error(400)
+            elif entry_id_required:
+                return self.error(400)
+            func(self, entry_id, entry_entity)
+        return wrapper
+    return decorator
+
+def check_comment_exists(comment_id_required=True):
+    def decorator(func):
+        def wrapper(self, comment_id=''):
+            comment_entity = None
+            if comment_id:
+                comment_key = db.Key.from_path('Comment', int(comment_id))
+                comment_entity = db.get(comment_key)
+                if not comment_entity:
+                    return self.error(400)
+            elif comment_id_required:
+                return self.error(400)
+            func(self, comment_entity)
         return wrapper
     return decorator

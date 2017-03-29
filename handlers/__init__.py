@@ -1,5 +1,5 @@
 """URL handlers"""
-from handlers.handler import Handler, to_dict, sanitize, check_logged_in
+from handlers.handler import Handler, to_dict, sanitize, check_logged_in, check_entry_exists, check_comment_exists
 from handlers.logout import Logout, logout_user
 from handlers.login import Login, valid_user_login, get_username
 from handlers.signup import Signup
