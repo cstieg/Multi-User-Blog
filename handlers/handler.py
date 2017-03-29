@@ -81,10 +81,11 @@ def check_entry_exists(entry_id_required=True):
                 entry_key = db.Key.from_path('BlogEntry', int(entry_id))
                 entry_entity = db.get(entry_key)
                 if not entry_entity:
+                    # bad request
                     return self.error(400)
             elif entry_id_required:
                 return self.error(400)
-            func(self, entry_id, entry_entity)
+            return func(self, entry_id, entry_entity)
         return wrapper
     return decorator
 
@@ -96,9 +97,34 @@ def check_comment_exists(comment_id_required=True):
                 comment_key = db.Key.from_path('Comment', int(comment_id))
                 comment_entity = db.get(comment_key)
                 if not comment_entity:
+                    # bad request
                     return self.error(400)
             elif comment_id_required:
                 return self.error(400)
-            func(self, comment_entity)
+            return func(self, comment_entity)
+        return wrapper
+    return decorator
+
+def check_user_owns_entry(must_own=True):
+    def decorator(func):
+        def wrapper(self, entry_entity):
+            user_id = handlers.get_username(self)
+            if entry_entity.author == user_id and must_own:
+                return func(self, entry_entity)
+            else:
+                # unauthorized
+                return self.error(401)
+        return wrapper
+    return decorator
+
+def check_user_owns_comment(must_own=True):
+    def decorator(func):
+        def wrapper(self, comment_entity):
+            user_id = handlers.get_username(self)
+            if comment_entity.author == user_id and must_own:
+                return func(self, comment_entity)
+            else:
+                # unauthorized
+                return self.error(401)
         return wrapper
     return decorator

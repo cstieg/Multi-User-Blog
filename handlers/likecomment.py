@@ -1,17 +1,12 @@
-from google.appengine.ext import db
 import models, handlers
 
 class LikeComment(handlers.Handler):
     """Adds a user like and increments like count for comment"""
     @handlers.check_logged_in
     @handlers.check_comment_exists
+    @handlers.check_user_owns_comment(False)  # Author cannot like own comment
     def post(self, comment_entity):
-        # author cannot like
         liker = handlers.get_username(self)
-        if liker == comment_entity.author:
-            self.error(403)
-            return
-
         if models.comment_is_liked(comment_entity, liker):
             # forbidden to like twice
             self.error(403)

@@ -53,3 +53,5 @@ class Signup(handlers.Handler):
                 self.response.set_cookie('username', username, max_age=60 * 60 * 24)
                 self.redirect('/newpost')
                 self.render('success.html', username=username)
+
+                # # TODO: ENCRYPT PASSWORD
