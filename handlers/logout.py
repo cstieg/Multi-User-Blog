@@ -1,6 +1,6 @@
-from handlers import Handler
+import handlers
 
-class Logout(Handler):
+class Logout(handlers.Handler):
     """Logs out user"""
     def get(self):
         logout_user(self)

@@ -1,9 +1,8 @@
 from google.appengine.ext import db
-from handlers import Handler, to_dict, get_username
-from models import Comment, post_is_liked, comment_is_liked
+import models, handlers
 
 
-class MainPage(Handler):
+class MainPage(handlers.Handler):
     """Displays the main blog page from template mainpage.html"""
     def get(self, entry_id=""):
         if entry_id:
@@ -16,24 +15,24 @@ class MainPage(Handler):
             entry_entities = db.GqlQuery("SELECT* FROM BlogEntry ORDER BY posted DESC")
 
         # recreate query in list of dicts in order to be able to pass in 'liked' variable
-        user_name = get_username(self)
+        user_name = handlers.get_username(self)
         entry_list = []
         for entry_entity in entry_entities:
-            entry_dict = to_dict(entry_entity)
+            entry_dict = handlers.to_dict(entry_entity)
             entry_dict['id'] = entry_entity.key().id()
-            entry_dict['liked'] = post_is_liked(entry_entity, user_name)
+            entry_dict['liked'] = models.post_is_liked(entry_entity, user_name)
 
             # add in comments
             comment_list = []
-            for comment in Comment.all().ancestor(entry_entity).order('posted'):
-                comment_dict = to_dict(comment)
+            for comment in models.Comment.all().ancestor(entry_entity).order('posted'):
+                comment_dict = handlers.to_dict(comment)
                 comment_dict['id'] = comment.key().id()
-                comment_dict['liked'] = comment_is_liked(comment, user_name)
+                comment_dict['liked'] = models.comment_is_liked(comment, user_name)
                 comment_list.append(comment_dict)
 
             entry_dict['comments'] = comment_list
 
             entry_list.append(entry_dict)
 
-        self.render('mainpage.html', blogEntries=entry_list, username=get_username(self))
+        self.render('mainpage.html', blogEntries=entry_list, username=handlers.get_username(self))
 

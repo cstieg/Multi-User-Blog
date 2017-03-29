@@ -1,27 +1,24 @@
 import time
 from google.appengine.ext import db
-from handlers import Handler, sanitize, valid_user_login, get_username
+import handlers
 
-class EditPost(Handler):
+class EditPost(handlers.Handler):
     """Replaces the blog text with the text passed in from /editpost/[postid]"""
-    def get(self, entry_id=""):
+    @handlers.check_logged_in
+    def get(self, entry_id=''):
         """Render template for editing entry"""
-        if not valid_user_login(self):
-            self.redirect("/login")
         if entry_id:
             # query entryEntity by id passed in
             entryKey = db.Key.from_path('BlogEntry', int(entry_id))
             entryEntity = db.get(entryKey)
 
-            self.render("edit.html", postID=entry_id, entry=entryEntity.entry, title=entryEntity.title, username=get_username(self))
+            self.render('edit.html', postID=entry_id, entry=entryEntity.entry, title=entryEntity.title, username=handlers.get_username(self))
         else:
             self.error(400)
 
-    def post(self, entry_id=""):
+    @handlers.check_logged_in
+    def post(self, entry_id=''):
         """Accept edited entry"""
-        # check to make sure valid login
-        if not valid_user_login(self):
-            self.redirect("/login")
         if entry_id:
             # query post by id passed in
             entry_key = db.Key.from_path('BlogEntry', int(entry_id))
@@ -32,9 +29,9 @@ class EditPost(Handler):
             entry_entity = db.get(entry_key)
 
             # only author can delete
-            if entry_entity.author == get_username(self):
-                title = sanitize(self.request.get("subject"))
-                entry = sanitize(self.request.get("content"))
+            if entry_entity.author == handlers.get_username(self):
+                title = handlers.sanitize(self.request.get('subject'))
+                entry = handlers.sanitize(self.request.get('content'))
 
                 # validate input
                 if title and entry:

@@ -1,8 +1,10 @@
 from google.appengine.ext import db
+import models
 
 class PostLike(db.Model):
     """Reader likes on the main entries of the blog"""
-    blogEntryID = db.IntegerProperty(required=True, indexed=True)
+    blogEntry = db.ReferenceProperty(models.BlogEntry, collection_name='likes')
+    # blogEntryID = db.IntegerProperty(required=True, indexed=True)
     liker = db.StringProperty(required=True, indexed=True)
     likeTime = db.DateTimeProperty(auto_now_add=True)
 
@@ -35,3 +37,8 @@ def post_is_liked(entry_entity, liker):
     entry_id = str(entry_entity.key().id())
     likes_query = db.GqlQuery("SELECT* FROM PostLike WHERE entry_id = %s AND liker = '%s'" % (entry_id, liker))
     return likes_query.count() > 0
+
+def like_count(entry_entity):
+    likes_query = PostLike.all()
+    likes_query.filter('blogEntry =', entry_entity)
+    return likes_query.count()

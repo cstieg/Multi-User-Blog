@@ -1,9 +1,8 @@
 import re
 from google.appengine.ext import db
-from handlers import Handler, sanitize
-from models import User
+import models, handlers
 
-class Signup(Handler):
+class Signup(handlers.Handler):
     """Allows a user new user to register to post, comment and like"""
     def get(self):
         """Renders the signup page"""
@@ -11,10 +10,10 @@ class Signup(Handler):
 
     def post(self):
         """Handles the signup submission"""
-        username = sanitize(self.request.get('username'))
-        password = sanitize(self.request.get('password'))
-        verify = sanitize(self.request.get('verify'))
-        email = sanitize(self.request.get('email'))
+        username = handlers.sanitize(self.request.get('username'))
+        password = handlers.sanitize(self.request.get('password'))
+        verify = handlers.sanitize(self.request.get('verify'))
+        email = handlers.sanitize(self.request.get('email'))
 
         # check inputs against regex
         username_re = re.compile("^[a-zA-z0-9_-]{3,20}$")
@@ -49,7 +48,7 @@ class Signup(Handler):
                                             old_email=email)
             else:
                 # Add User entity to datastore
-                new_user_entity = User(username=username, password=password)
+                new_user_entity = models.User(username=username, password=password)
                 new_user_entity.put()
                 self.response.set_cookie('username', username, max_age=60 * 60 * 24)
                 self.redirect('/newpost')

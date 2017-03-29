@@ -1,24 +1,21 @@
-from handlers import Handler, valid_user_login, get_username, sanitize
-from models import BlogEntry
+import models, handlers
 
-class Compose(Handler):
+class Compose(handlers.Handler):
     """Handler for new entry"""
+    @handlers.check_logged_in('?caller=newpost')
     def get(self):
         """Render compose new entry template"""
-        if not valid_user_login(self):
-            self.redirect("/login?caller=newpost")
-        self.render("compose.html", entry="", username=get_username(self))
+        self.render("compose.html", entry="", username=handlers.get_username(self))
 
+    @handlers.check_logged_in
     def post(self):
         """Accept new entry"""
-        if not valid_user_login(self):
-            self.redirect("/login")
-        title = sanitize(self.request.get("subject"))
-        entry = sanitize(self.request.get("content"))
-        username = sanitize(self.request.cookies.get("username"))
+        title = handlers.sanitize(self.request.get("subject"))
+        entry = handlers.sanitize(self.request.get("content"))
+        username = handlers.sanitize(self.request.cookies.get("username"))
 
         if title and entry:
-            new_entry_entity = BlogEntry(title=title, entry=entry, author=username)
+            new_entry_entity = models.BlogEntry(title=title, entry=entry, author=username)
             new_entry_entity.put()
             self.redirect("/" + str(new_entry_entity.key().id()))
         else:

@@ -4,6 +4,7 @@ import datetime
 import webapp2
 import jinja2
 from google.appengine.ext import db
+import handlers
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), *[os.pardir, 'templates'])
 JINJA_ENV = jinja2.Environment(autoescape=True, loader=jinja2.FileSystemLoader(TEMPLATE_DIR))
@@ -61,3 +62,13 @@ def sanitize(text_to_sanitize):
         return cgi.escape(text_to_sanitize)
     else:
         return text_to_sanitize
+
+
+def check_logged_in(url_args):
+    def decorator(func):
+        def wrapper(self, entry_id=''):
+            if not handlers.valid_user_login(self):
+                return self.redirect('/login' + url_args)
+            return func(self, entry_id)
+        return wrapper
+    return decorator

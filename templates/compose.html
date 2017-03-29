@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block content %}
+    {% block formAction %}
+    <h3>Compose New Post</h3>
+    <main>
+        <form method="post" action="newpost">{% endblock formAction %}
+        <label>
+          <p class="form-label">Title</p>
+          <input class="form-input" name="subject" type="text" value="{{title}}">
+        </label><br>
+        <label>
+          <p class="form-label">Blog Entry</p>
+          <textarea class="form-input" name="content" cols="50" rows="25"
+            placeholder="Type entry here...">{{entry}}</textarea>
+        </label>
+        <br>
+        <input type="submit">
+        <button name="cancel" onclick="window.history.back()">Cancel</button>
+      </form>
+
+      <br>
+      <span class="error">{{error}}</span>
+    </main>
+{% endblock content %}
