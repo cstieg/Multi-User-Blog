@@ -8,12 +8,12 @@
         <form method="post" action="newpost">{% endblock formAction %}
         <label>
           <p class="form-label">Title</p>
-          <input class="form-input" name="subject" type="text" value="{{title}}">
+          <input class="form-input" name="subject" type="text" value="{{entry.title}}">
         </label><br>
         <label>
           <p class="form-label">Blog Entry</p>
           <textarea class="form-input" name="content" cols="50" rows="25"
-            placeholder="Type entry here...">{{entry}}</textarea>
+            placeholder="Type entry here...">{{entry.entry}}</textarea>
         </label>
         <br>
         <input type="submit">

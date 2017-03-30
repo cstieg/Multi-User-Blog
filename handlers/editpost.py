@@ -11,10 +11,10 @@ class EditPost(handlers.Handler):
         """Render template for editing entry"""
         self.render('edit.html', entry=entry_entity, username=handlers.get_username(self))
 
-    # @handlers.check_logged_in
-    # @handlers.check_entry_exists
-    # @handlers.check_user_owns_entry
-    def post(self, entry_id, entry_entity):
+    @handlers.check_logged_in()
+    @handlers.check_entry_exists()
+    @handlers.check_user_owns_entry()
+    def post(self, entry_entity):
         """Accept edited entry"""
         title = handlers.sanitize(self.request.get('subject'))
         entry = handlers.sanitize(self.request.get('content'))
