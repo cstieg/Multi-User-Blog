@@ -4,16 +4,16 @@ import handlers
 
 class EditPost(handlers.Handler):
     """Replaces the blog text with the text passed in from /editpost/[postid]"""
-    @handlers.check_logged_in
-    @handlers.check_entry_exists
-    @handlers.check_user_owns_entry
-    def get(self, entry_id, entry_entity):
+    @handlers.check_logged_in()
+    @handlers.check_entry_exists()
+    @handlers.check_user_owns_entry()
+    def get(self, entry_entity):
         """Render template for editing entry"""
-        self.render('edit.html', postID=entry_id, entry=entry_entity.entry, title=entry_entity.title, username=handlers.get_username(self))
+        self.render('edit.html', entry=entry_entity, username=handlers.get_username(self))
 
-    @handlers.check_logged_in
-    @handlers.check_entry_exists
-    @handlers.check_user_owns_entry
+    # @handlers.check_logged_in
+    # @handlers.check_entry_exists
+    # @handlers.check_user_owns_entry
     def post(self, entry_id, entry_entity):
         """Accept edited entry"""
         title = handlers.sanitize(self.request.get('subject'))

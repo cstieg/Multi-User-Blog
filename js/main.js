@@ -119,7 +119,7 @@ function addComment(entryID, username) {
 // without refreshing
 function deleteComment(commentID, entryID) {
   $.post({
-    url: '/deletecomment/' + String(commentID) + '/' + String(entryID),
+    url: '/deletecomment/' + String(commentID),
     success: function() {
       $('#' + String(commentID)).remove();
       var $commentCount = $('#' + String(entryID) + ' .comment-count')[0];
@@ -146,7 +146,7 @@ function editComment(commentID, entryID) {
   var commentTextField = $('#edit-comment-dialog [name=comment]');
   var commentText = commentTextField[0].value;
   $.post({
-    url: '/editcomment/' + String(commentID) + '/' + String(entryID),
+    url: '/editcomment/' + String(commentID),
     data: {'comment': commentText},
     success: function() {
       $('#' + commentID + ' .comment-text')[0].innerText = commentText;
@@ -207,7 +207,7 @@ function commentSectionHTML(comment, entryID, username) {
 // make ajax call to server to like comment and increment comment like count
 function likeComment(commentID, entryID) {
   $.post({
-    url : '/likecomment/' + String(commentID) + '/' + String(entryID),
+    url : '/likecomment/' + String(commentID),
     success: function() {
       var $likeButton = $('#' + commentID + ' .like-comment-button');
       var $likeCount = $('#' + commentID + ' .like-comment-count');
@@ -232,7 +232,7 @@ function likeComment(commentID, entryID) {
 // make ajax call to server to unlike comment and decrement comment like count
 function unlikeComment(commentID, entryID) {
   $.post({
-    url: '/unlikecomment/' + String(commentID) + '/' + String(entryID),
+    url: '/unlikecomment/' + String(commentID),
     success: function() {
       var $likeButton = $('#' + commentID + ' .like-comment-button');
       var $likeCount = $('#' + commentID + ' .like-comment-count');

@@ -1,10 +1,13 @@
+import logging
 import os
 import cgi
 import datetime
 import webapp2
 import jinja2
 from google.appengine.ext import db
+from functools import wraps
 import handlers
+from operator import xor
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), *[os.pardir, 'templates'])
 JINJA_ENV = jinja2.Environment(autoescape=True, loader=jinja2.FileSystemLoader(TEMPLATE_DIR))
@@ -66,15 +69,18 @@ def sanitize(text_to_sanitize):
 
 def check_logged_in(url_args=''):
     def decorator(func):
-        def wrapper(self, entry_id=''):
-            if not handlers.valid_user_login(self):
-                return self.redirect('/login' + url_args)
-            return func(self, entry_id)
+        @wraps(func)
+        def wrapper(handler, *args, **kwargs):
+            if not handlers.valid_user_login(handler):
+                handler.redirect('/login' + url_args)
+            func(handler, *args, **kwargs)
         return wrapper
     return decorator
 
+
 def check_entry_exists(entry_id_required=True):
     def decorator(func):
+        @wraps(func)
         def wrapper(self, entry_id=''):
             entry_entity = None
             if entry_id:
@@ -85,12 +91,14 @@ def check_entry_exists(entry_id_required=True):
                     return self.error(400)
             elif entry_id_required:
                 return self.error(400)
-            return func(self, entry_id, entry_entity)
+            func(self, entry_entity)
         return wrapper
     return decorator
 
+
 def check_comment_exists(comment_id_required=True):
     def decorator(func):
+        @wraps(func)
         def wrapper(self, comment_id=''):
             comment_entity = None
             if comment_id:
@@ -101,16 +109,19 @@ def check_comment_exists(comment_id_required=True):
                     return self.error(400)
             elif comment_id_required:
                 return self.error(400)
-            return func(self, comment_entity)
+            func(self, comment_entity)
         return wrapper
     return decorator
 
+
 def check_user_owns_entry(must_own=True):
     def decorator(func):
+        @wraps(func)
         def wrapper(self, entry_entity):
             user_id = handlers.get_username(self)
-            if entry_entity.author == user_id and must_own:
-                return func(self, entry_entity)
+            if (entry_entity.author == user_id and must_own) or \
+               (entry_entity.author != user_id and not must_own):
+                func(self, entry_entity)
             else:
                 # unauthorized
                 return self.error(401)
@@ -119,10 +130,12 @@ def check_user_owns_entry(must_own=True):
 
 def check_user_owns_comment(must_own=True):
     def decorator(func):
+        @wraps(func)
         def wrapper(self, comment_entity):
             user_id = handlers.get_username(self)
-            if comment_entity.author == user_id and must_own:
-                return func(self, comment_entity)
+            if (comment_entity.author == user_id and must_own) or \
+               (comment_entity.author != user_id and not must_own):
+                func(self, comment_entity)
             else:
                 # unauthorized
                 return self.error(401)

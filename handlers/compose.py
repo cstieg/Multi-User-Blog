@@ -5,11 +5,12 @@ class Compose(handlers.Handler):
     @handlers.check_logged_in('?caller=newpost')
     def get(self):
         """Render compose new entry template"""
-        self.render("compose.html", entry="", username=handlers.get_username(self))
+        self.render('compose.html', entry='', username=handlers.get_username(self))
 
-    @handlers.check_logged_in
+    @handlers.check_logged_in()
     def post(self):
         """Accept new entry"""
+        # TODO: put these variables into entry dict
         title = handlers.sanitize(self.request.get('subject'))
         entry = handlers.sanitize(self.request.get('content'))
         username = handlers.sanitize(self.request.cookies.get('username'))
