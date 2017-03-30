@@ -1,5 +1,7 @@
-import json
-import models, handlers
+from webapp2_extras import json
+import models
+import handlers
+
 
 class AddComment(handlers.Handler):
     """Add a comment to a particular post"""
@@ -14,4 +16,6 @@ class AddComment(handlers.Handler):
 
         user_id = handlers.get_username(self)
         new_comment_entity = models.add_comment(entry_entity, comment_text, user_id)
-        self.response.out.write(json.dumps(new_comment_entity))
+        new_comment_dict = handlers.to_dict(new_comment_entity)
+        new_comment_dict['liked'] = False
+        self.response.out.write(json.encode(new_comment_dict))

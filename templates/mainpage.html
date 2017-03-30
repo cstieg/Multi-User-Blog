@@ -15,14 +15,14 @@
             <div class="likes">
                 {% if username and entry.author != username %}
                 <button class="like-button" onclick="
-                    {% if entry.liked %}
-                        unlikePost
+                    {% if entry.liked(username) %}
+                        f_unlikePost
                     {% else %}
-                        likePost
+                        f_likePost
                     {% endif %}
                     ({{entry.id}})">
                     👍
-                    {% if entry.liked %}
+                    {% if entry.liked(username) %}
                         Unlike
                     {% else %}
                         Like
@@ -81,14 +81,14 @@
                                 <span class="like-comment-label">👍 Likes: </span>
                             {% else %}
                                 <button class="like-comment-button" onclick="
-                                  {% if comment.liked %}
-                                    unlikeComment
+                                  {% if comment.liked(username) %}
+                                    f_unlikeComment
                                   {% else %}
-                                    likeComment
+                                    f_likeComment
                                   {% endif %}
-                                  ({{comment.id}}, {{entry.id}})">
+                                  ({{comment.id}})">
                                   👍
-                                  {% if comment.liked %}
+                                  {% if comment.liked(username) %}
                                       Unlike
                                   {% else %}
                                       Like
@@ -99,9 +99,9 @@
                         </div>
                         {% if username and username == comment.author %}
                             <button class="comment-edit"
-                                onclick="editCommentInput({{comment.id}}, {{entry.id}})">Edit</button>
+                                onclick="editCommentInput({{comment.id}})">Edit</button>
                             <button class="comment-delete"
-                                onclick="deleteComment({{comment.id}}, {{entry.id}})">Delete</button>
+                                onclick="deleteComment({{comment.id}})">Delete</button>
                         {% endif %}
                         <span class="comment-posted">
                             Written on {{comment.posted}} by {{comment.author}}

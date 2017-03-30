@@ -1,7 +1,7 @@
 """URL handlers"""
-from handlers.handler import (Handler, to_dict, sanitize, check_logged_in,
+from handlers.handler import (Handler, sanitize, check_logged_in, to_dict,
                               check_entry_exists, check_comment_exists,
-                              check_user_owns_comment, check_user_owns_entry)
+                              check_user_owns_entry, check_user_owns_comment)
 from handlers.logout import Logout, logout_user
 from handlers.login import Login, valid_user_login, get_username
 from handlers.signup import Signup
