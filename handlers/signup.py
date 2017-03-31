@@ -1,6 +1,8 @@
+
 import re
 from google.appengine.ext import db
-import models, handlers
+import models
+import handlers
 
 class Signup(handlers.Handler):
     """Allows a user new user to register to post, comment and like"""
@@ -18,7 +20,6 @@ class Signup(handlers.Handler):
         # check inputs against regex
         username_re = re.compile("^[a-zA-z0-9_-]{3,20}$")
         username_invalid = not username_re.match(username)
-
         password_re = re.compile("^.{3,20}$")
         password_invalid = not password_re.match(password)
 
@@ -48,10 +49,9 @@ class Signup(handlers.Handler):
                                             old_email=email)
             else:
                 # Add User entity to datastore
-                new_user_entity = models.User(username=username, password=password)
+                hashSaltPassword = models.hashed_salted_password(password)
+                new_user_entity = models.User(username=username, password=hashSaltPassword)
                 new_user_entity.put()
                 self.response.set_cookie('username', username, max_age=60 * 60 * 24)
                 self.redirect('/newpost')
                 self.render('success.html', username=username)
-
-                # # TODO: ENCRYPT PASSWORD
