@@ -16,6 +16,7 @@ def unlike_post(entry_entity, unliker):
     """Deletes a PostLike entity"""
     likes_query = PostLike.all()
     likes_query.filter('liker =', unliker)
+    likes_query.filter('blogEntry =', entry_entity)
     like_entity = likes_query.get()
     like_entity.delete()
 

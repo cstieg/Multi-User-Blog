@@ -13,20 +13,35 @@ own entries and comments.
 * _app.yaml_ contains configuration information for Google App Engine to be able
 to find the folders and files to run the app.
 * _index.yaml_ contains a list of the indexes to be created
+
 ### Python Backend
 * _main.py_ is the entry point of the app and contains the URL routing information.
-* _model.py_ contains the entity classes for the data as well as functions to
-manipulate that data.
-* _entryView.py_ contains the router classes for displaying the main page and
-composing, editing, and deleting blog entries.
-* _commentView.py_ contains the router classes for displaying and manipulating
-comments.
-* _likeView.py_ contains the router classes for liking and unliking.
-* _loginView.py_ contains the router classes for logging in and out as well as
-signing up.
-* _handler.py_ contains a class extending the webapp2 handler to simplify
-template rendering.
-* _utils.py_ contains some necessary helper functions.
+#### Handlers Module
+* _addcomment.py_ adds a comment to a particular blog entry.
+* _compose.py_ composes a new blog entry.
+* _deletecomment.py_ deletes a comment on a blog entry.
+* _deletepost.py_ deletes a particular blog entry.
+* _editcomment.py_ edits a particular comment on a blog entry.
+* _editpost.py_ edits a particular blog entry.
+* _handler.py_ contains the base handler class which extends the webapp2 handler,
+and is extended by each of the other handlers. It also has decorators to check
+the validity of HTTP calls to the handlers, as well as other miscellaneous functions.
+* _likecomment.py_ likes a particular comment on a blog entry.
+* _likepost.py_ likes a particular blog entry.
+* _login.py_ logs in a registered user.
+* _logout.py_ logs out a registered user.
+* _mainpage.py_ displays the main page or a particular blog entry.
+* _signup.py_ registers a user to participate on the blog.
+#### Models Module
+* _blogentry.py_ contains the class representing the blog entries.
+* _comment.py_ contains the class representing comments on the blog entries,
+as well as functions to manipulate them.
+* _commentlike.py_ contains the class representing likes on the comments,
+as well as functions to manipulate them.
+* _postlike.py_ contains the class representing likes on the blog entries,
+as well as functions to manipulate them.
+* _user.py_ contains the class representing a logged-in user, as well as code
+to hash and salt the password.
 
 ### HTML templates (/templates)
 * _base.html_ is basic HTML code common to all the pages which is rendered by jinja2.

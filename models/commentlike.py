@@ -15,6 +15,7 @@ def unlike_comment(comment_entity, unliker):
     """Deletes a CommentLike entity"""
     likes_query = CommentLike.all()
     likes_query.filter('liker =', unliker)
+    likes_query.filter('comment =', comment_entity)
     like_entity = likes_query.get()
     like_entity.delete()
 
@@ -28,12 +29,12 @@ def comment_is_liked(comment_entity, liker):
 def comment_like_count(comment_entity):
     """Returns the number of likes for a comment"""
     likes_query = CommentLike.all()
-    likes_query.filter('Comment =', comment_entity)
+    likes_query.filter('comment =', comment_entity)
     return likes_query.count()
 
 def delete_comment_likes(comment_entity):
     """Deletes all the likes for a comment"""
     likes_query = CommentLike.all()
-    likes_query.filter('Comment =', comment_entity)
+    likes_query.filter('comment =', comment_entity)
     for like in likes_query:
         like.delete()

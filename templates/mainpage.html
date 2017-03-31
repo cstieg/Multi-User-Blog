@@ -16,9 +16,9 @@
                 {% if username and entry.author != username %}
                 <button class="like-button" onclick="
                     {% if entry.liked(username) %}
-                        f_unlikePost
+                        unlikePost
                     {% else %}
-                        f_likePost
+                        likePost
                     {% endif %}
                     ({{entry.id}})">
                     👍
@@ -82,9 +82,9 @@
                             {% else %}
                                 <button class="like-comment-button" onclick="
                                   {% if comment.liked(username) %}
-                                    f_unlikeComment
+                                    unlikeComment
                                   {% else %}
-                                    f_likeComment
+                                    likeComment
                                   {% endif %}
                                   ({{comment.id}})">
                                   👍

@@ -21,7 +21,7 @@ function deletePost(entryID) {
 
 // make ajax call to server to like entry, and on success, toggle like button
 // to unlike and increment like count without refreshing page
-function f_likePost(entryID) {
+function likePost(entryID) {
   if (WAITING_FOR_AJAX) {
     return;
   }
@@ -36,7 +36,7 @@ function f_likePost(entryID) {
 
       // change onclick to unlike function
       oldFunc = $likeButton.attr('onclick');
-      newFunc = oldFunc.replace('f_like', 'f_unlike');
+      newFunc = oldFunc.replace('like', 'unlike');
       $likeButton.attr('onclick', newFunc);
 
       // increment like-count
@@ -53,7 +53,7 @@ function f_likePost(entryID) {
 
 // make ajax call to server to unlike entry, and on success, toggle unlike
 // button to like and decrement like count wihout refreshing page
-function f_unlikePost(entryID) {
+function unlikePost(entryID) {
   if (WAITING_FOR_AJAX) {
     return;
   }
@@ -69,7 +69,7 @@ function f_unlikePost(entryID) {
 
       // change onclick to like function
       oldFunc = $likeButton.attr('onclick');
-      newFunc = oldFunc.replace('f_unlike', 'f_like');
+      newFunc = oldFunc.replace('unlike', 'like');
       $likeButton.attr('onclick', newFunc);
 
       // increment like-count
@@ -198,7 +198,7 @@ function commentSectionHTML(comment, username) {
 }
 
 // make ajax call to server to like comment and increment comment like count
-function f_likeComment(commentID) {
+function likeComment(commentID) {
   if (WAITING_FOR_AJAX) {
     return;
   }
@@ -213,7 +213,7 @@ function f_likeComment(commentID) {
 
       // change onclick to unlike function
       oldFunc = $likeButton.attr('onclick');
-      newFunc = oldFunc.replace('f_like', 'f_unlike');
+      newFunc = oldFunc.replace('like', 'unlike');
       $likeButton.attr('onclick', newFunc);
 
       // increment like-count
@@ -229,7 +229,7 @@ function f_likeComment(commentID) {
 }
 
 // make ajax call to server to unlike comment and decrement comment like count
-function f_unlikeComment(commentID) {
+function unlikeComment(commentID) {
   if (WAITING_FOR_AJAX) {
     return;
   }
@@ -245,7 +245,7 @@ function f_unlikeComment(commentID) {
 
       // change onclick to like function
       oldFunc = $likeButton.attr('onclick');
-      newFunc = oldFunc.replace('f_unlike', 'f_like');
+      newFunc = oldFunc.replace('unlike', 'like');
       $likeButton.attr('onclick', newFunc);
 
       // increment like-count
