@@ -75,7 +75,7 @@ calls to the backend, updating accordingly without refreshing the page.
 * To publish the site to Google Cloud Platform,
     * Create a [gcloud account](console.cloud.google.com).
     * Create a new project and note the project id.
-    * In the Google Cloud SDK Shell, type `gcloud app deploy [project id]` and
+    * In the Google Cloud SDK Shell, type `gcloud app deploy app.yaml --project [project id]` and
     hit Enter.  Select an appropriate server location, and hit Y to continue.
     * Create indexes by typing `gcloud datastore create-indexes index.yaml [project id]`.
     * The website can be accessed at the address [project id].appspot.com.
