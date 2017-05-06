@@ -77,7 +77,7 @@ calls to the backend, updating accordingly without refreshing the page.
     * Create a new project and note the project id.
     * In the Google Cloud SDK Shell, type `gcloud app deploy app.yaml --project [project id]` and
     hit Enter.  Select an appropriate server location, and hit Y to continue.
-    * Create indexes by typing `gcloud datastore create-indexes index.yaml [project id]`.
+    * Create indexes by typing `gcloud datastore create-indexes index.yaml --project [project id]`.
     * The website can be accessed at the address [project id].appspot.com.
 
 ## License
